@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../providers/AuthProvider";
 
 const Store = () => {
   const [data, setData] = useState([]);
-
+  const { userInfo } = useAuth();
+  console.log(userInfo);
   const getAllStore = () => {
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getAllStore`, {
+    const data = new FormData();
+    data.append("orgId", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/authority/getAllStoreForOrg`, {
       method: "POST",
+      body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res.message,'clg')
-        setData(res.message.filter(store => store.store_id !== 0));
+        console.log(res)
+        setData(res);
       })
       .catch((err) => console.log(err));
   };

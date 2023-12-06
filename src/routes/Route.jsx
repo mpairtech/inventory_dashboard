@@ -14,6 +14,8 @@ import Invoices from "../pages/Invoices";
 import Reports from "../pages/Reports";
 import Setup from "../pages/Setup";
 import Activities from "../pages/Activities";
+import AddProduct from "../pages/AddProduct";
+import AddStore from "../pages/AddStore";
 
 
 const router = createBrowserRouter([
@@ -36,11 +38,16 @@ const router = createBrowserRouter([
                 ),
             },
 
-
             {
                 path: "/store",
                 element: (
                     <Store />
+                ),
+            },
+            {
+                path: "/add-store",
+                element: (
+                    <AddStore />
                 ),
             },
             {
@@ -53,6 +60,12 @@ const router = createBrowserRouter([
                 path: "/product-list",
                 element: (
                     <ProductList />
+                ),
+            },
+            {
+                path: "/add-product",
+                element: (
+                    <AddProduct />
                 ),
             },
 

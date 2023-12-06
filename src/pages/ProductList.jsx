@@ -204,7 +204,8 @@ const ProductList = () => {
           <div className="col-lg-12 border-bottom p-3">
             <p className="fs-5 pt-2 fw-600 mb-0">Product List</p>
             <div className="row align-items-center justify-content-between font-14">
-              <div className="col-lg-6 d-flex align-items-center">
+
+              <div className="col-lg-7 d-flex align-items-center">
                 <p className="m-0">
                   Total product
                   <span class="badge text-bg-primary mx-2">
@@ -219,15 +220,16 @@ const ProductList = () => {
                   </span>
                 </p>
               </div>
+              {/* <div className="col-lg-4  ">     </div> */}
 
-              <div className="col-lg-4 text-end">
+              <div className="col-lg-3 text-end d-flex ">
                 <input
                   onChange={(e) => setSearchField(e.target.value)}
                   type="text"
                   className="border  shadow-none  pos-input w-75"
                 />
                 <button className="btn_small serach-magnify px-3 border-0 rounded-0 rounded-end">
-                  <i className="fa-solid fa-magnifying-glass"></i>
+                  <i className="fa-solid fa-magnifying-glass fa-lg"></i>
                 </button>
               </div>
               <div className="col-lg-2 text-end">
@@ -264,7 +266,7 @@ const ProductList = () => {
           {/* { */}
           {/* selectedProduct &&  productData.variations &&  */}
           <div className="col-lg-5">
-            <div className="row">
+            <div className="">
               <div className="col-lg-12 p-0">
                 <div className="my-3">
                   <div className="">
@@ -585,7 +587,7 @@ const ProductList = () => {
                                 </tr>
                               ) : (
                                 <div>
-                                  <p className="mt-4">
+                                  <p className="mt-4 ">
                                     No Product Selected. Please select a
                                     product
                                   </p>
