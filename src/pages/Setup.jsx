@@ -45,6 +45,7 @@ const Setup = () => {
                     toast.error("Failed to Add User");
                 }
             })
+            .catch((err) => console.log(err));
     };
 
 

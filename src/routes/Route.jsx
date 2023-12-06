@@ -13,6 +13,7 @@ import Expenses from "../pages/Expenses";
 import Invoices from "../pages/Invoices";
 import Reports from "../pages/Reports";
 import Setup from "../pages/Setup";
+import Activities from "../pages/Activities";
 
 
 const router = createBrowserRouter([
@@ -77,6 +78,12 @@ const router = createBrowserRouter([
                 path: "/reports",
                 element: (
                     <Reports />
+                ),
+            },
+            {
+                path: "/activities",
+                element: (
+                    <Activities />
                 ),
             },
             {

@@ -4,6 +4,7 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const TopBar = () => {
   const { userInfo } = useAuth();
+  console.log(userInfo);
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -28,7 +29,7 @@ const TopBar = () => {
           </Link>
 
           <div className="nav-right bg-white rounded me-3 d-flex align-items-center py-1 border">
-            <h6 className="mx-3 my-2 text-muted font-14 fw-bold">Nokshikatha</h6>
+            <h6 className="mx-3 my-2 text-muted font-14 fw-bold">{userInfo?.role}</h6>
             <div className="dropdown me-2 shadow-none border-0 ">
               <p
                 className="user-nav m-0 text-end shadow-none"
@@ -39,7 +40,7 @@ const TopBar = () => {
                 aria-expanded="false"
               >
                 <span className="">
-                  User Name
+                  {userInfo?.name}
                 </span>
                 <i className="fa-regular fa-user ms-2"></i>
               </p>
@@ -51,7 +52,7 @@ const TopBar = () => {
                   <div className="row p-2 shadow-none">
                     <div className="col-lg-12 px-0 bg-white shadow-none">
                       <p className="p-2 mb-1 font-14 fw-600">
-                        User Name
+                      {userInfo?.name}
                         <br />
                         {/* <span className="font-10 fw-300"> </span> */}
                       </p>
