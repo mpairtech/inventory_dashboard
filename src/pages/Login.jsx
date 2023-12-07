@@ -30,6 +30,7 @@ const Login = () => {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res);
         if (res.user_id) {
           setLoader(false);
           localStorage.setItem("token", JSON.stringify(res));

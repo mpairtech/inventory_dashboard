@@ -20,7 +20,7 @@ const CustomizeAttribute = () => {
         e.preventDefault();
         const data = new FormData();
         data.append("name", AttributeName);
-        data.append("orgId", userInfo?.organizationData?.org_id);
+        data.append("org_id", userInfo?.organizationData?.org_id);
 
         fetch(`${import.meta.env.VITE_SERVER}/product/createAttribute`, {
             method: "POST",
@@ -44,7 +44,7 @@ const CustomizeAttribute = () => {
 
     const getAllAttributes = () => {
         const data = new FormData();
-        data.append("orgId", userInfo?.organizationData?.org_id);
+        data.append("org_id", userInfo?.organizationData?.org_id);
         fetch(`${import.meta.env.VITE_SERVER}/product/getAllAttributesForOrg`, {
             method: "POST",
             body: data,

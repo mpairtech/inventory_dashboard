@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useAuth } from '../../providers/AuthProvider';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../providers/AuthProvider';
 
 const CustomizeOrg = () => {
 
     //! ORGANIZATION
-
+    const {userInfo} = useAuth();
     const [update, setUpdate] = useState(0);
 
     const [orgName, setOrgName] = useState("");

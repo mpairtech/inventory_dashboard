@@ -17,7 +17,7 @@ const CustomizeUnit = () => {
         e.preventDefault();
         const data = new FormData();
         data.append("name", unitName);
-        data.append("orgId", userInfo?.organizationData?.org_id);
+        data.append("org_id", userInfo?.organizationData?.org_id);
 
         fetch(`${import.meta.env.VITE_SERVER}/product/createUnit`, {
             method: "POST",
@@ -41,7 +41,7 @@ const CustomizeUnit = () => {
 
     const getAllUnits = () => {
         const data = new FormData();
-        data.append("orgId", userInfo?.organizationData?.org_id);
+        data.append("org_id", userInfo?.organizationData?.org_id);
         fetch(`${import.meta.env.VITE_SERVER}/product/getAllUnitsForOrg`, {
             method: "POST",
             body: data,
@@ -56,7 +56,7 @@ const CustomizeUnit = () => {
 
     useEffect(() => {
         getAllUnits();
-    }, [update]);
+    }, [userInfo,update]);
 
 
     const handleDelete = (id) => {

@@ -24,6 +24,9 @@ export const AuthProvider = (props) => {
       .then((res) => res.json())
       .then((res) => {
         if (res[0].user_id !== null) {
+          if (res[0].isComplete === "NO") {
+            navigator("/setup");
+          }
           setUserInfo(res[0]);
           setLoading(false);
         } else {

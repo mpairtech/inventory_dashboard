@@ -226,7 +226,7 @@ const AddProduct = () => {
     const date = new Date();
     const year = String(date.getFullYear());
     const data = new FormData();
-    data.append("orgId", userInfo?.organizationData?.org_id);
+    data.append("org_id", userInfo?.organizationData?.org_id);
     fetch(`${import.meta.env.VITE_SERVER}/product/getLastProductId`, {
       method: "POST",
     })

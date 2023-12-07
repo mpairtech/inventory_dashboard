@@ -38,7 +38,7 @@ const AddStore = () => {
       }
     }
     const data = new FormData();
-    data.append("orgId", userInfo?.organizationData?.org_id);
+    data.append("org_id", userInfo?.organizationData?.org_id);
     data.append("name", storeName);
     data.append("manager", manager);
     data.append("number", number);

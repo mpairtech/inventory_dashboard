@@ -38,11 +38,11 @@ const Setup = () => {
             .then((res) => res.json())
             .then((res) => {
                 console.log(res);
-                if (res.org_id) {
-                    toast.success("Organization Setup Successfull");
+                if (res?.message) {
+                    toast.success(res?.message);
                     navigate("/");
                 } else {
-                    toast.error("Failed to Add User");
+                    toast.error("Failed to Setup Organization");
                 }
             })
             .catch((err) => console.log(err));

@@ -49,7 +49,7 @@ const CustomizeUser = () => {
       button: true,
       cell: (row) => (
         <>
-          <Link to={`/zone/employeeinfo/${row.employee_id}`}>
+          <Link to={`/zone/employeeinfo/${row.user_id}`}>
             <i className="fa-solid fa-edit fa-lg fa-icon me-2"></i>
           </Link>
           <button
@@ -116,7 +116,6 @@ const CustomizeUser = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [store, setStore] = useState("");
-  const [storeList, setStoreList] = useState([]);
   const [searchField, setSearchField] = useState(null);
 
 
@@ -152,7 +151,7 @@ const CustomizeUser = () => {
   };
 
   const [userList, setUserList] = useState([]);
-
+  console.log(userList);
 
   const getAllUser = () => {
     fetch(`${import.meta.env.VITE_SERVER}/authority/getAllUsers`, {
@@ -181,6 +180,21 @@ const CustomizeUser = () => {
     getAllUser();
   }, [update, searchField]);
 
+  const handleDelete = (id) => {
+    console.log(id);
+    const data = new FormData();
+    data.append("user_id", id);
+    fetch(`${import.meta.env.VITE_SERVER}/authority/deleteUser`, {
+        method: "POST",
+        body: data,
+    })
+        .then((res) => res.json())
+        .then((res) => {
+            toast.success("Unit Deleted Successfully");
+            setUpdate(!update);
+        })
+        .catch((err) => console.log(err));
+}
 
 
     return (

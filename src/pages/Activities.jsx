@@ -42,7 +42,7 @@ const Activities = () => {
         },
         {
             name: "Description",
-            selector: (row) => row.des,
+            selector: (row) => (row.des).slice(0, 200) + "...",
             sortable: true,
             minWidth: false,
             width: "30%",
@@ -123,7 +123,6 @@ const Activities = () => {
     const [data, setData] = useState([]);
     const [page, setPage] = useState(1);
 
-    const countPerPage = 1;
 
     const getAllActivities = () => {
         const data = new FormData();
@@ -195,7 +194,7 @@ const Activities = () => {
                                         pagination
                                         paginationServer
                                         // paginationTotalRows={users.total}
-                                        paginationPerPage={countPerPage}
+                                        paginationPerPage={3}
                                         paginationComponentOptions={{
                                             noRowsPerPage: true
                                         }}

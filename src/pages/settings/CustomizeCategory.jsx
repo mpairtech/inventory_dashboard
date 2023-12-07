@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../providers/AuthProvider';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -9,20 +9,25 @@ const CustomizeCategory = () => {
     const { userInfo } = useAuth();
     console.log(userInfo);
 
-    const [update, setUpdate] = useState(0);
+    const [update, setUpdate] = useState(false);
 
-    const [name, setName] = useState("");
-   
+    const [categoryList, setCategoryList] = useState([]);
+    const [subCategoryList, setSubCategoryList] = useState([]);
+
     const [img, setImg] = useState("");
+    const [name, setName] = useState("");
+
+    const [activeCategory, setActiveCategory] = useState("")
+    console.log(activeCategory);
 
     const addCategory = (e) => {
         e.preventDefault();
         const data = new FormData();
         data.append("img", img);
         data.append("name", name);
-        data.append("orgId", userInfo?.organizationData?.org_id);
+        data.append("org_id", userInfo?.organizationData?.org_id);
         data.append("user_id", userInfo?.user_id);
-      
+
         fetch(`${import.meta.env.VITE_SERVER}/product/createCategory`, {
             method: "POST",
             body: data,
@@ -32,6 +37,7 @@ const CustomizeCategory = () => {
                 console.log(res);
                 if (res.category_id) {
                     toast.success("Category Setup Successfull");
+                    setUpdate(!update);
                 } else {
                     toast.error("Failed to Add User");
                 }
@@ -39,52 +45,234 @@ const CustomizeCategory = () => {
     };
 
 
+    const getAllCategories = () => {
+        const data = new FormData();
+        data.append("org_id", userInfo?.organizationData?.org_id);
+        fetch(`${import.meta.env.VITE_SERVER}/product/getAllMainCategoriesForOrg`, {
+            method: "POST",
+            body: data,
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res);
+                setCategoryList(
+                    res.filter((category) => category.parent_id === null)
+                );
+            })
+            .catch((err) => console.log(err));
+    };
+
+
+    const addSubCategory = (e) => {
+        e.preventDefault();
+
+        if (activeCategory === "") return toast.error("Please Select a Category");
+
+        const data = new FormData();
+        data.append("name", name);
+        data.append("parent_id", activeCategory);
+        data.append("org_id", userInfo?.organizationData?.org_id);
+        data.append("user_id", userInfo?.user_id);
+
+        fetch(`${import.meta.env.VITE_SERVER}/product/createSubCategory`, {
+            method: "POST",
+            body: data,
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res);
+                if (res.category_id) {
+                    toast.success("Category Setup Successfull");
+                    setUpdate(!update);
+                } else {
+                    toast.error("Failed to Add User");
+                }
+            })
+    };
+
+
+    const getAllSubCategories = () => {
+        const data = new FormData();
+        data.append("org_id", userInfo?.organizationData?.org_id);
+        fetch(`${import.meta.env.VITE_SERVER}/product/getAllSubcategoriesForOrg`, {
+            method: "POST",
+            body: data,
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res);
+                setSubCategoryList(res);
+            })
+            .catch((err) => console.log(err));
+    };
+
+
+
+    useEffect(() => {
+        getAllCategories();
+        getAllSubCategories();
+    }, [userInfo, update]);
+
+
+
+    const handleDelete = (id) => {
+        const data = new FormData();
+        data.append("category_id", id);
+        data.append("user_id", userInfo?.user_id);
+        fetch(`${import.meta.env.VITE_SERVER}/product/deleteCategory`, {
+            method: "POST",
+            body: data,
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                toast.success("Category Deleted Successfully");
+                setUpdate(!update);
+            })
+            .catch((err) => console.log(err));
+    }
+
+
     return (
-        <div className="container min-vh-84 d-flex justify-content-start align-items-start ">
-            <form onSubmit={addCategory} className="col-lg-12 mt-1">
-                <h1 className="fs-5" >
-                    Customize Category
-                </h1>
-                <div className="col-lg-2"
-                >
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <label
-                                htmlFor="recipient-name"
-                                className="col-form-label text-muted fw-500"
-                            >Upload Logo</label>
+        <div className='container'>
+            <div className="d-flex justify-content-start align-items-start border-bottom pb-3">
+                <div className='row'>
+                    <form onSubmit={addCategory} className="col-6 mt-1">
+                        <h1 className="fs-5" >
+                            Customize Category
+                        </h1>
+                        <div className=""
+                        >
+                            <div className="row">
+                                <div className="">
+                                    <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted fw-500"
+                                    >Upload Logo</label>
 
-                            <input type="file" className="form-control py-2 font-13 shadow-none bg-white"
-                                onChange={(e) => {
-                                    setImg(e.target.files[0]);
-                                }}
-                            />
+                                    <input type="file" className="form-control py-2 font-13 shadow-none bg-white"
+                                        onChange={(e) => {
+                                            setImg(e.target.files[0]);
+                                        }}
+                                    />
+                                </div>
+                                <div className="">
+                                    <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted fw-500"
+                                    >
+                                        Category Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control py-2 font-13 shadow-none bg-white"
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                </div>
+
+                            </div>
                         </div>
-                        <div className="col-lg-12">
-                            <label
-                                htmlFor="recipient-name"
-                                className="col-form-label text-muted fw-500"
+                        <div className="">
+                            <button
+                                type="submit"
+                                className="btn_primary  mt-3"
                             >
-                                Category Name
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control py-2 font-13 shadow-none bg-white"
-                                onChange={(e) => setName(e.target.value)}
-                            />
+                                Confirm
+                            </button>
                         </div>
+                    </form>
 
-                    </div>
                 </div>
-                <div className="">
-                    <button
-                        type="submit"
-                        className="btn_primary  mt-3"
+
+                <div className="col-2">
+                    <label
+                        htmlFor="recipient-name"
+                        className="col-form-label text-muted fw-500"
                     >
-                        Confirm
-                    </button>
+                        Category Name
+                    </label>
+                    {categoryList.map((category) => (
+                        <div
+                            onClick={() => setActiveCategory(category.category_id)}
+                            className={`d-flex justify-content-between align-items-center  p-2 rounded-2 cursor-pointer  ${activeCategory
+                                ? activeCategory === category.category_id ? "bg-light3" : ""
+                                : ""
+                                }`}>
+                            <p className="font-13">{category.name}</p>
+                            <i className="fas fa-trash-alt cursor-pointer" onClick={() => handleDelete(category.category_id)}></i>
+                        </div>
+                    ))}
                 </div>
-            </form>
+            </div>
+            <div className="d-flex justify-content-start align-items-start border-bottom pt-2">
+                <div className='row'>
+                    <form onSubmit={addSubCategory} className="col-6 mt-1">
+                        <h1 className="fs-5" >
+                            Customize Sub Category
+                        </h1>
+                        <div className=""
+                        >
+                            <div className="row">
+                                <div className="">
+                                    <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted fw-500"
+                                    >Upload Logo</label>
+
+                                    <input type="file" className="form-control py-2 font-13 shadow-none bg-white"
+                                        onChange={(e) => {
+                                            setImg(e.target.files[0]);
+                                        }}
+                                    />
+                                </div>
+                                <div className="">
+                                    <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted fw-500"
+                                    >
+                                        Sub Category Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control py-2 font-13 shadow-none bg-white"
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                </div>
+
+                            </div>
+                        </div>
+                        <div className="">
+                            <button
+                                type="submit"
+                                className="btn_primary  mt-3"
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div className="col-2">
+                    <label
+                        htmlFor="recipient-name"
+                        className="col-form-label text-muted fw-500"
+                    >
+                        Category Name
+                    </label>
+                    {subCategoryList.map((category) => (
+                        <div
+                            onClick={() => setActiveCategory(category.category_id)}
+                            className={`d-flex justify-content-between align-items-center  p-2 rounded-2 cursor-pointer  ${activeCategory
+                                ? activeCategory === category.category_id ? "bg-light3" : ""
+                                : ""
+                                }`}>
+                            <p className="font-13">{category.name}</p>
+                            <i className="fas fa-trash-alt cursor-pointer" onClick={() => handleDelete(category.category_id)}></i>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
         </div>
     )
 }

@@ -238,6 +238,10 @@ border-radius: 5px;
   background-color: #f2f2f2 !important;
 }
 
+.bg-light3 {
+  background-color: #a6c2f56b !important;
+}
+
 .bg-accent {
   background-color: "#16666825", !important;
 }

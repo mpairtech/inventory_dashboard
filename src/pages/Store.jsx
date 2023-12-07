@@ -8,7 +8,7 @@ const Store = () => {
   console.log(userInfo);
   const getAllStore = () => {
     const data = new FormData();
-    data.append("orgId", userInfo?.organizationData?.org_id);
+    data.append("org_id", userInfo?.organizationData?.org_id);
     fetch(`${import.meta.env.VITE_SERVER}/authority/getAllStoreForOrg`, {
       method: "POST",
       body: data,
@@ -50,20 +50,20 @@ const Store = () => {
                 </div>
                 <div className="card-body" style={{ minHeight: "68vh" }}>
                   <div className="row">
-                    {data.map((item) => (
+                    {data?.map((item) => (
                       <div
-                        key={item.store_id}
+                        key={item?.store_id}
                         className="col-lg-3 col-md-6 col-12 mb-3 "
                       >
                         <div className="card bg-light rounded border-1 border-secondary">
                           <div className="card-body p-4">
                             <span
-                              className={`badge rounded-pill float-md-end mb-3 mb-sm-0 ${item.status == 1 ? "pos-orange" : "pos-red"
+                              className={`badge rounded-pill float-md-end mb-3 mb-sm-0 ${item?.status == 1 ? "pos-orange" : "pos-red"
                                 }`}
                             >
-                              {item.status == 1 ? "Active" : "Inactive"}
+                              {item?.status == 1 ? "Active" : "Inactive"}
                             </span>
-                            <h5>{item.name}</h5>
+                            <h5>{item?.name}</h5>
                             <div className="mt-3">
                               <span className="text-muted d-block">
                                 <i className="fa fa-user" aria-hidden="true" />
@@ -72,7 +72,7 @@ const Store = () => {
                                   target="_blank"
                                   className="text-muted ms-1"
                                 >
-                                  {item.manager}
+                                  {item?.manager}
                                 </a>
                               </span>
                               <span className="text-muted d-block">
@@ -80,12 +80,12 @@ const Store = () => {
                                   className="fa fa-map me-1"
                                   aria-hidden="true"
                                 />
-                                {item.location}
+                                {item?.location}
                               </span>
                             </div>
                             <div className="mt-4 text-end">
                               <Link
-                                to={`/store/${item.store_id}`}
+                                to={`/store/${item?.store_id}`}
                                 className="btn_primary "
                               >
                                 View Details
