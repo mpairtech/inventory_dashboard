@@ -320,13 +320,13 @@ border-radius: 5px;
 
 .btn_active3:hover {
   background-color: #0b46c5;
-  color: #ffffff;
-  border: none;
   transition: all 0.1s ease-in-out;
+  /* color: #ffffff;
+  border: none;
   font-size: 14px;
   padding: 10px 20px;
   border-radius: 3px;
-  font-weight: 500;
+  font-weight: 500; */
 }
 
 .btn_inactive3 {

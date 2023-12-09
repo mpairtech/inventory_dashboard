@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 const CustomizeAttribute = () => {
     const navigate = useNavigate();
     const { userInfo } = useAuth();
-    console.log(userInfo);
 
     const [update, setUpdate] = useState(false);
 
@@ -28,7 +27,6 @@ const CustomizeAttribute = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 if (res.attribute_id) {
                     toast.success("Attribute Added Successfull");
                     setUpdate(!update);

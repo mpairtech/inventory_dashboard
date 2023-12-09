@@ -134,7 +134,6 @@ const Activities = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res)
                 setData(res.activities)
             }
             )

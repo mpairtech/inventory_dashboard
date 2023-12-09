@@ -4,7 +4,6 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const TopBar = () => {
   const { userInfo } = useAuth();
-  console.log(userInfo);
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");

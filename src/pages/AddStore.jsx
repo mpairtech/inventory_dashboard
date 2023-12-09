@@ -50,7 +50,6 @@ const AddStore = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         if (res) {
           toast.success("Store added successfully");
           // setUpdate((prevUpdate) => prevUpdate + 1);
