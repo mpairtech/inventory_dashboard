@@ -12,6 +12,7 @@ const ProductList = () => {
 
   const [searchField, setSearchField] = useState(null);
   const [selectedProductName, setSelectedProductName] = useState("");
+
   createTheme({
     background: {
       default: "#f9f9e1",
@@ -91,7 +92,7 @@ const ProductList = () => {
   const { userInfo } = useAuth();
 
   const [data, setData] = useState([]);
-  // console.log(data)
+  console.log(data)
   const getAllProducts = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);

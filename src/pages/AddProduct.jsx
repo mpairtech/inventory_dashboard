@@ -53,7 +53,9 @@ const AddProduct = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data)
-        setProductId(data.message);
+        setProductId(
+          `P${new Date().getFullYear() % 100}${data.message}`
+        );
       })
       .catch((err) => console.error(err.message));
   };
@@ -167,12 +169,12 @@ const AddProduct = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     console.log(itemsArray, "itemsArray");
-  
+
     const data = new FormData();
     data.append("product_id", productId);
     data.append("name", productName);
     data.append("price", price);
-    data.append("qty", itemsArray[0]?.quantity);
+    data.append("qty", +itemsArray[0]?.quantity);
     data.append("des", description);
     data.append("org_id", userInfo?.organizationData?.org_id);
     data.append("categoryIds", selectedCategory + ", " + selectedSubCategory);
@@ -180,20 +182,25 @@ const AddProduct = () => {
     data.append("categoryId", selectedSubCategory);
     data.append("user_id", userInfo?.user_id);
 
+    // console log all the data
+    for (var pair of data.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
+
     fetch(`${import.meta.env.VITE_SERVER}/product/addProduct`, {
-        method: "POST",
-        body: data,
+      method: "POST",
+      body: data,
     })
-        .then((res) => res.json())
-        .then((res) => {
-            console.log(res);
-            if (res.product_id) {
-                toast.success("Product Added Successfully");
-                navigate("/product-list");
-            } else {
-                toast.error("Failed to Add Product");
-            }
-        })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        if (res.product_id) {
+          toast.success("Product Added Successfully");
+          navigate("/product-list");
+        } else {
+          toast.error("Failed to Add Product");
+        }
+      })
 
   };
 

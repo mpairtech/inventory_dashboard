@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import DataTable, { createTheme } from "react-data-table-component";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { UserInfoContext } from "../providers/AuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 
 createTheme({
   background: {
@@ -62,14 +62,15 @@ const Transfer = () => {
     },
 
   ];
-  const { userInfo, storeInfo } = useContext(UserInfoContext);
+  const { userInfo } = useAuth();
+
   const [data, setData] = useState([]);
   const [transferTo, setTransferTo] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState("");
-
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  console.log(selectedProducts)
   const [date, setDate] = useState("");
   const [storeList, setStoreList] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
+  const [searchedProducts, setSearchedProducts] = useState([]);
 
 
   const [selectedProductName, setSelectedProductName] = useState("");
@@ -80,14 +81,14 @@ const Transfer = () => {
   const [description, setDescription] = useState("");
 
   const [productData, setProductData] = useState([]);
-  const [search, setSearch] = useState("");
+
+  const [searchText, setSearchText] = useState("");
+
   const [show, setShow] = useState(false);
   const [update, setUpdate] = useState(0);
   const [searchField, setSearchField] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
 
   const [selectedVariations, setSelectedVariations] = useState([]);
-  console.log(selectedVariations);
 
   const fields = [
     "Transfer To",
@@ -98,7 +99,7 @@ const Transfer = () => {
 
   const conditions = [
     transferTo === "",
-    selectedProduct === "",
+    selectedProducts === "",
     selectedProductName === "",
     date === "",
   ];
@@ -130,74 +131,65 @@ const Transfer = () => {
 
   const getDropDownStore = () => {
     const data = new FormData();
-    data.append("store_id", userInfo.store_id);
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getAllGeneralStores`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/authority/getAllStoreForOrg`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        setStoreList(res.message);
+        console.log(res)
+        setStoreList(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+
+  const getSearchedProduct = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    data.append("searchTerm", searchText);
+    fetch(`${import.meta.env.VITE_SERVER}/product/searchProduct`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setSearchedProducts(res);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_SERVER}/getAllProduct`, {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setAllProducts(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    getSearchedProduct();
+  }, [searchText]);
 
-  useEffect(() => {
-    const data = new FormData();
-    data.append("product_id", selectedProduct);
-    fetch(`${import.meta.env.VITE_SERVER}/getProductById`, {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-        setProductData(res);
-      })
-      .catch((err) => console.log(err));
-  }, [selectedProduct]);
 
   useEffect(() => {
     getDropDownStore();
     getAllTransfers();
   }, [update, searchField]);
 
+  console.log(searchedProducts)
+
   const handleMakeTransfer = (e) => {
     e.preventDefault();
-    for (let i = 0; i < conditions.length; i++) {
-      if (conditions[i]) {
-        // setLoader(false);
-        toast.error(`Fill up the ${fields[i]} field!`);
-        return false;
-      }
-    }
+    // for (let i = 0; i < conditions.length; i++) {
+    //   if (conditions[i]) {
+    //     // setLoader(false);
+    //     toast.error(`Fill up the ${fields[i]} field!`);
+    //     return false;
+    //   }
+    // }
     const data = new FormData();
-    data.append("store_from", storeInfo.store_id);
+    // data.append("store_from", storeInfo.store_id);
     data.append("store_to", transferTo);
-    data.append("product_id", selectedProduct);
-    data.append("product_name", selectedProductName);
-    data.append("product_price", price);
-    data.append("imgSrc_1", productData.imgSrc_1);
-    data.append("imgSrc_2", productData.imgSrc_2);
-    data.append("imgSrc_3", productData.imgSrc_3);
-    data.append("imgSrc_4", productData.imgSrc_4);
-    data.append("des", description);
+    data.append("selectedProducts", JSON.stringify(selectedProducts));
     data.append("date", date);
-      
-    data.append("variations", JSON.stringify(selectedVariations));
-    
-    fetch(`${import.meta.env.VITE_SERVER}/admin/transferProductMain`, {
+    // data.append("variations", JSON.stringify(selectedVariations));
+
+    fetch(`${import.meta.env.VITE_SERVER}/stock/transferProducts`, {
       method: "POST",
       body: data,
     })
@@ -205,7 +197,7 @@ const Transfer = () => {
       .then((res) => {
         console.log(res);
         toast.success("Product Transferred");
-        setUpdate(update + 1);
+        // setUpdate(update + 1);
       })
       .catch((err) => console.log(err));
   };
@@ -239,7 +231,7 @@ const Transfer = () => {
                 aria-labelledby="exampleModalLabel"
                 aria-hidden="true"
               >
-                <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal-dialog modal-dialog-centered ">
                   <div className="modal-content">
                     <div className="modal-header">
                       <h1 className="modal-title fs-5" id="exampleModalLabel">
@@ -255,7 +247,7 @@ const Transfer = () => {
                     <div className="modal-body">
                       <form className="col-lg-12 ">
                         <div className="row">
-                          <div className="mb-2 col-lg-6">
+                          {/* <div className="mb-2 col-lg-6">
                             <label
                               htmlFor="recipient-name"
                               className="col-form-label  font-14 fw-bold"
@@ -267,8 +259,8 @@ const Transfer = () => {
                               value={storeInfo?.name}
                               disabled
                             />
-                          </div>
-                          <div className="mb-2 col-lg-6">
+                          </div> */}
+                          <div className="mb-2 col-lg-12">
                             <label
                               htmlFor="recipient-name"
                               className="col-form-label font-14 fw-bold"
@@ -305,7 +297,7 @@ const Transfer = () => {
                             id="message-text"
                             placeholder="Search Product"
                             onChange={(e) => {
-                              setSearch(e.target.value);
+                              setSearchText(e.target.value);
                               setShow(true);
                             }}
                           />
@@ -319,38 +311,31 @@ const Transfer = () => {
                               background: "white",
                               width: "90%",
                               left: "5%",
+                              top: "46%",
                               padding: 10,
                             }}
                             className="shadow-lg mb-0 pb-0 bg-white  rounded"
                           >
-                            {allProducts
-                              .filter((item) => {
-                                if (
-                                  item.product_id
-                                    .toLowerCase()
-                                    .includes(search.toLowerCase())
-                                ) {
-                                  return item;
-                                }
-                              })
+                            {searchedProducts
                               .map((item, index) => (
                                 <div
                                   key={item.product_id}
                                   className="pb-0 mb-2 ps-2 border-bottom"
                                   onClick={() => {
-                                    setSelectedProductName(item.pname);
-                                    setSelectedProduct(item.product_id);
-                                    setAvailableQty(item.qty);
-                                    setPrice(item.price);
-
-                                    setDescription(item.des);
+                                    // setSelectedProductName(item.name);
+                                    // make array of product_id
+                                    setSelectedProducts(
+                                      selectedProducts.includes(item)
+                                        ? [...selectedProducts]
+                                        : [...selectedProducts, item]
+                                    );
                                     setShow(false);
                                   }}
                                   style={{ cursor: "pointer" }}
                                 >
                                   <p>
                                     {" "}
-                                    {item.product_id} ({item.pname})
+                                    {item.product_id} ({item.name})
                                   </p>
                                 </div>
                               ))}
@@ -365,88 +350,59 @@ const Transfer = () => {
                               htmlFor="message-text"
                               className="col-form-label font-14 fw-bold"
                             >
-                              Product
+                              Selected Products
                             </label>
-                            <p className="form-control py-2 font-13 shadow-none bg-white">
-                              {productData.pname}{" "}
-                            </p>
-                          </div>
-                          {/* <div className="col-lg-6 mb-2">
-                            <label
-                              htmlFor="message-text"
-                              className="col-form-label font-14 fw-bold"
-                            >
-                              Color
-                            </label>
-                            <div
-                              style={{
-                                width: "120px",
-                                height: "24px",
-                                borderRadius: "10px",
-                                backgroundColor: productData.color,
-                              }}
-                            >
-                              <span className="ms-2">{productData.color}</span>
-                            </div>
-                          </div> */}
+                            {
+                              selectedProducts?.map((item, i) => (
+                                <div key={item.product_id} className="row">
+                                  <div className="col-lg-4 mb-2">
+                                    <input
+                                      type="text"
+                                      className="form-control py-2 font-13 shadow-none bg-white"
+                                      value={item.name}
+                                      disabled
+                                    />
+                                  </div>
+                                  <div className="col-lg-4 pt-2">
+                                    {
+                                      item?.attributeIds.split(",").map((id, i) => (
+                                        <p className="d-inline bg-success p-2 rounded-2 me-2">{id}</p>
+                                      ))
+                                    }
 
-                          {/*    <div className="row">
+                                  </div>
 
-                          <div className="col-lg-8 mb-2">
-                            <label
-                              htmlFor="message-text"
-                              className="col-form-label font-14 fw-bold"
-                            >
-                              Product Variation
-                            </label>
-                            <select
-                              className="form-control py-2 font-13 shadow-none"
-                              onChange={(e) => {
-                                setSize(e.target.value);
-                                setVariationId(e.target.value);
-                                setSelectedItem(
-                                  productData.variations.find(
-                                    (item) => item.vid === e.target.value
-                                  )
-                                );
-                                // setRemaining(e.target.value);
-                              }}
-                            >
-                              <option selected disabled value="">
-                                Select Size
-                              </option>
-                              {productData.variations?.map((item, i) => (
-                                <option
-                                  className="font-14"
-                                  key={item.vid}
-                                  value={item.vid}
-                                >
-                                   Size - {item.size}
-                                </option>
-                              ))}
-                            </select>
+                                  <div className="col-lg-4 mb-2">
+                                    <input
+                                      type="number"
+                                      className="form-control py-2 font-13 shadow-none bg-white"
+                                      id={`quantity-${item.product_id}`}
+                                      placeholder="Quantity"
+                                      onChange={(e) => {
+                                        const productId = item.product_id;
+                                        const quantity = parseInt(e.target.value);
+                                        const updatedProducts = [...selectedProducts];
+                                        const existingIndex = updatedProducts.findIndex((p) => p.product_id === productId);
+
+                                        if (existingIndex !== -1) {
+                                          // If product ID already exists, update the quantity
+                                          updatedProducts[existingIndex].quantity = quantity;
+                                        } else {
+                                          // If product ID doesn't exist, add it to the array
+                                          updatedProducts.push({ productId, quantity });
+                                        }
+
+                                        setSelectedProducts(updatedProducts);
+                                      }}
+                                    />
+                                    <p className="text-center text-muted font-13 mt-1">Available: {item.qty}</p>
+                                  </div>
+
+                                </div>
+                              ))
+                            }
                           </div>
 
-                          <div className="col-lg-4 mb-2">
-                            <label
-                              htmlFor="message-text"
-                              className="col-form-label font-14 fw-bold"
-                            >
-                              Transfer Quantity
-                            </label>
-                            <input
-                              type="number"
-                              className="form-control py-2 font-13 shadow-none bg-white"
-                              id="message-text"
-                              onChange={(e) => setQuantity(e.target.value)}
-                            />
-                         {
-                          availableQty &&    <p className="text-center text-muted font-13 mt-1">Available : {availableQty}</p>
-                         }
-
-                          </div>
-                          
-                          </div> */}
                         </div>
                         <div className="row">
                           <div className="col-lg-8 mb-2">
@@ -469,7 +425,7 @@ const Transfer = () => {
                             productData.variations?.map((item, i) => (
                               <div key={item.vid} className="row">
                                 <div className="col-lg-8 mb-2">
-                                <input
+                                  <input
                                     type="text"
                                     className="form-control py-2 font-13 shadow-none bg-white"
                                     value={`Size - ${item.size}`}
@@ -584,8 +540,8 @@ const Transfer = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
