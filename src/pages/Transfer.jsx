@@ -183,7 +183,7 @@ const Transfer = () => {
     //   }
     // }
     const data = new FormData();
-    // data.append("store_from", storeInfo.store_id);
+    data.append("store_from", "motherStoreId001");
     data.append("store_to", transferTo);
     data.append("selectedProducts", JSON.stringify(selectedProducts));
     data.append("date", date);

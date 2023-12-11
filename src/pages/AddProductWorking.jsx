@@ -21,7 +21,7 @@ const AddProduct = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   console.log(selectedSubCategory, "selectedSubCategory");
 
-  const [attributes, setAttributes] = useState([]);
+  const [attributes, setAttributes] = useState("");
 
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
@@ -97,46 +97,23 @@ const AddProduct = () => {
 
 
   const addVariant = (e) => {
-    console.log(attributes)
-    // attributes [ '30', 'Red' ]
-    console.log(itemsArray)
-    // itemsArray { attributes: [ '30', 'Red' ], quantity: 123 }
     e.preventDefault();
-    // const existingItem = itemsArray.find(item => (JSON.stringify(item.attributes)) === (JSON.stringify(attributes)));
-    const existingItem = itemsArray.find(item => {
+    const existingItem = itemsArray.find(item => item.attributes === attributes);
 
-      if (item.attributes.length !== attributes.length) {
-        return false;
-      }
-      const sortedArr1 = item.attributes.slice().sort();
-      const sortedArr2 = attributes.slice().sort();
-
-      for (let i = 0; i < sortedArr1.length; i++) {
-        if (sortedArr1[i] !== sortedArr2[i]) {
-          return false;
-        }
-      }
-      return true;
-
-    });
-
-    console.log(existingItem, "existingItem")
     if (existingItem) {
       const updatedItemsArray = itemsArray.map(item =>
         item.attributes === attributes ? { ...item, quantity: item.quantity + parseInt(quantity, 10) } : item
       );
       setItemsArray(updatedItemsArray);
-      document.getElementById("variantForm").reset();
     } else {
       const newObject = {
         attributes: attributes,
         quantity: parseInt(quantity, 10),
       };
       setItemsArray([...itemsArray, newObject]);
-      document.getElementById("variantForm").reset();
     }
 
-    setAttributes([]);
+    setAttributes("");
     setQuantity("");
 
   };
@@ -188,7 +165,7 @@ const AddProduct = () => {
   }, [selectedAttribute]);
 
 
-  console.log(itemsArray)
+
   const handleAddProduct = async (e) => {
     e.preventDefault();
     console.log(itemsArray, "itemsArray");
@@ -480,7 +457,7 @@ const AddProduct = () => {
             Stock Variation
           </h6>
 
-          <form id="variantForm" onSubmit={addVariant} className="row py-2">
+          <div className="row py-2">
             {attributeList.length > 0 && (
               attributeList.map((attribute) => (
                 <div className="col-lg-2 py-2" key={attribute.attribute_id}>
@@ -489,11 +466,10 @@ const AddProduct = () => {
                     <select
                       className="form-control py-2 font-13 shadow-none"
                       onChange={(e) => {
-                        let attributesArray = [...attributes];
-                        if (e.target.value !== "") {
-                          attributesArray.push(e.target.value);
-                          setAttributes(attributesArray);
-                        }
+                        let attributesArray = attributes.split(', ');
+                        attributesArray.push(e.target.value);
+                        let newAttributes = attributesArray.join(', ');
+                        setAttributes(newAttributes.startsWith(', ') ? newAttributes.slice(2) : newAttributes);
                       }}
                       // value={attributes}
                       placeholder="Choose size"
@@ -528,13 +504,13 @@ const AddProduct = () => {
 
             <div className="col-lg-2 py-2 mt-2">
               <button
-                type="submit"
+                onClick={addVariant}
                 className="btn_active3 w-100 mt-4"
               >
                 Add Variation
               </button>
             </div>
-          </form>
+          </div>
 
           <div className="mb-3 rounded-2 ">
             {itemsArray.length !== 0 && (
@@ -572,10 +548,10 @@ const AddProduct = () => {
                       <p className="form-label label1 ms-2">{index + 1}</p>
                     </div>
                     <div className="col-2">
-                      <p className="form-label label1 ms-2"> {(item?.attributes)?.join(", ")}</p>
+                      <p className="form-label label1 ms-2"> {item.attributes}</p>
                     </div>
                     <div className="col-2  ">
-                      <p className="form-label label1 ms-3"> {item?.quantity}</p>
+                      <p className="form-label label1 ms-3"> {item.quantity}</p>
                     </div>
 
                     <div className="col-1">
