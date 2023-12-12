@@ -107,7 +107,7 @@ const ProductList = () => {
             res.filter(
               (item) =>
                 item.product_id.toLowerCase().includes(searchField) ||
-                item.pname
+                item.name
                   .toLowerCase()
                   .includes(searchField.toLowerCase())
             )
@@ -221,7 +221,7 @@ const ProductList = () => {
                   <p className="m-0">
                     Total Stock Quantity
                     <span class="badge text-bg-primary ms-2">
-                      {data?.reduce((a, b) => a + b.product_qty, 0)}
+                      432423
                     </span>
                   </p>
                 </div>

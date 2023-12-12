@@ -365,8 +365,8 @@ const Transfer = () => {
                                   </div>
                                   <div className="col-lg-4 pt-2">
                                     {
-                                      item?.attributeIds.split(",").map((id, i) => (
-                                        <p className="d-inline bg-success p-2 rounded-2 me-2">{id}</p>
+                                      item?.attributeIds?.map((name, i) => (
+                                        <p key={name} className="d-inline bg-success p-2 rounded-2 me-2">a{name}</p>
                                       ))
                                     }
 

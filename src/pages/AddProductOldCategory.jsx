@@ -191,9 +191,6 @@ const AddProduct = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     console.log(itemsArray, "itemsArray");
-    const categoryIdsArray = [];
-    categoryIdsArray.push(selectedCategory);
-    categoryIdsArray.push(selectedSubCategory);
 
     const data = new FormData();
     data.append("product_id", productId);
@@ -202,9 +199,9 @@ const AddProduct = () => {
     // data.append("qty", +itemsArray[0]?.quantity);
     data.append("des", description);
     data.append("org_id", userInfo?.organizationData?.org_id);
+    data.append("categoryIds", selectedCategory + ", " + selectedSubCategory);
     data.append("categoryId", selectedSubCategory);
     data.append("user_id", userInfo?.user_id);
-    data.append("categoryIds",  JSON.stringify(categoryIdsArray));
     data.append("itemsArray", JSON.stringify(itemsArray));
 
     // console log all the data
