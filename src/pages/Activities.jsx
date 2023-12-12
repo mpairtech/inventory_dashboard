@@ -42,8 +42,7 @@ const Activities = () => {
         },
         {
             name: "Description",
-            selector: (row) => (row.des).slice(0, 200) + "...",
-            sortable: true,
+            selector: (row) => (row.des).slice(0, 60),
             minWidth: false,
             width: "30%",
         },

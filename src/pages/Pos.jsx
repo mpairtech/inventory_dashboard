@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { UserInfoContext } from "../providers/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -9,15 +8,18 @@ import 'swiper/css/navigation';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination, Navigation } from 'swiper/modules';
+import { useAuth } from "../providers/AuthProvider";
 
 const Pos = () => {
+
+  const { userInfo } = useAuth();
+  console.log(userInfo);
   const myRef = useRef(null);
+
   const [refTotal, setRefTotal] = useState();
-  const { userInfo, storeInfo } = useContext(UserInfoContext);
-  console.log(storeInfo, "storeInfo");
-  const [product, setProduct] = useState([]);
+  const [searchedProduct, setSearchedProduct] = useState([]);
   const [cate, setCate] = useState([]);
-  const [search, setSearch] = useState("");
+  const [searchText, setSearch] = useState("");
   const [show, setShow] = useState(false);
   const [items, setItems] = useState([]);
   const [coun, setCoun] = useState(0);
@@ -107,7 +109,7 @@ const Pos = () => {
         setAllCustomers(res.message);
       })
       .catch((err) => console.log(err));
-  }, [search]);
+  }, [searchText]);
 
   const [pos, setPos] = useState("");
 
@@ -156,21 +158,22 @@ const Pos = () => {
 
   useEffect(() => {
     const data = new FormData();
-    data.append("store_id", userInfo.store_id);
-    fetch(`${import.meta.env.VITE_SERVER}/allStoreStockProduct`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    data.append("searchTerm", searchText);
+    fetch(`${import.meta.env.VITE_SERVER}/product/searchProduct`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        setProduct(res.message);
+        setSearchedProduct(res);
       })
       .catch((err) => console.log(err));
-  }, [search]);
+  }, [searchText]);
 
   function addcart(im, x, p_id, y, p, z, m) {
     var item = {
-      img : im,
+      img: im,
       name: x,
       p_id: p_id,
       quantity: y,
@@ -215,7 +218,7 @@ const Pos = () => {
       document.getElementById("fname").focus();
       var i = document.getElementById("fname").value;
 
-      product.map((item) => {
+      searchedProduct.map((item) => {
         if (item.id == i) {
           addcart(item.product_name, 10, 10, 10, 10);
         }
@@ -422,18 +425,18 @@ const Pos = () => {
 
   const getStoreProducts = () => {
     const data = new FormData();
-    data.append("store_id", 5);
-    fetch(`${import.meta.env.VITE_SERVER}/getAllProductsByStoreId`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/product/getAllProductsForOrg`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         if (activeCategory == 0) {
-          setData(res.message)
+          setData(res)
         } else {
-          const storeData = res.message.filter((item) => {
+          const storeData = res.filter((item) => {
             return item.category_id == activeCategory;
           });
           setData(storeData);
@@ -459,15 +462,15 @@ const Pos = () => {
           <div className="col-lg-8 mt-3" style={{ position: "relative" }}>
             <div className="p-3">
               <div className='d-flex align-content-center '>
-              <p className="mt-1 me-2 cursor-pointer"  onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
-                <p className='fs-5 fw-bold'>Categories</p>
+                <p className=" me-2 cursor-pointer" onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
+                <p className='fs-5 fw-bold '>Categories</p>
                 <div
                   style={
                     {
                       background: activeCategory == 0 ? "#ffce00" : "",
                       hover: "#1e90ff",
                       cursor: "pointer",
-                      
+
                     }
                   }
                   className='ms-3 rounded-pill px-4 py-1 border'
@@ -563,7 +566,6 @@ const Pos = () => {
                   }
                 </div>
 
-
               </div>
             </div>
           </div>
@@ -574,9 +576,9 @@ const Pos = () => {
               <div className="py-3" style={{ height: "100vh" }}>
                 <div className="bg-white rounded-3 position-relative" >
                   <div>
-                    <div style={{ display: "flex" }} className="p-3 border-bottom">
+                    <div className="p-3 border-bottom d-flex  align-items-center ">
                       <i
-                        className="fa fa-search fs-5 px-3 mt-2"
+                        className="fa fa-search fs-5 px-3"
                         style={{ position: "absolute" }}
                       ></i>
                       <input
@@ -602,36 +604,36 @@ const Pos = () => {
                         }}
                         className="shadow-lg mb-0 pb-0  rounded"
                       >
-                        {product
+                        {searchedProduct
                           .filter((item) => {
-                            const productNameMatch = item.product_name
+                            const productNameMatch = item.name
                               ?.toLowerCase()
-                              .includes(search?.toLowerCase());
-                            const variationIdMatch = item.variation_id
+                              .includes(searchText?.toLowerCase());
+                            const variationIdMatch = item.product_id
                               ?.toLowerCase()
-                              .includes(search.toLowerCase());
+                              .includes(searchText.toLowerCase());
                             return productNameMatch || variationIdMatch;
                           })
                           .map((item, index) => (
                             <div
-                              key={item.variation_id}
+                              key={item.product_id}
                               className="pb-0 mb-2 ps-2 hover_effect"
                               onClick={() => {
                                 setShow(false);
                                 addcart(
                                   item.imgSrc_1,
-                                  item.product_name,
+                                  item.name,
                                   item.product_id,
                                   1,
-                                  item.product_price,
+                                  item.price,
                                   item.product_id,
-                                  item.product_qty
+                                  item.qty
                                 );
                               }}
                               style={{ cursor: "pointer", zIndex: 999 }}
                             >
                               <p>
-                                {item.product_name} | {item.variation_id}
+                                {item.name} | {item.product_id}
                               </p>
                             </div>
                           ))}
@@ -914,7 +916,7 @@ const Pos = () => {
                                         if (
                                           item.c_name
                                             ?.toLowerCase()
-                                            .includes(search.toLowerCase())
+                                            .includes(searchText.toLowerCase())
                                         ) {
                                           return item;
                                         }

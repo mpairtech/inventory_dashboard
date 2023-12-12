@@ -16,6 +16,7 @@ import Setup from "../pages/Setup";
 import Activities from "../pages/Activities";
 import AddProduct from "../pages/AddProduct";
 import AddStore from "../pages/AddStore";
+import Pos from "../pages/Pos";
 
 
 const router = createBrowserRouter([
@@ -100,6 +101,10 @@ const router = createBrowserRouter([
                 ),
             },
             {
+                path: "/pos",
+                element: <Pos />,
+            },
+            {
                 path: "/settings",
                 element: (
                     <Settings />
@@ -114,6 +119,7 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
     },
+   
 
 ]);
 

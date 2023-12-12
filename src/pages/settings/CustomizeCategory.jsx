@@ -18,6 +18,8 @@ const CustomizeCategory = () => {
     const [name, setName] = useState("");
 
     const [activeCategory, setActiveCategory] = useState("")
+    const [activeSubCategory, setActiveSubCategory] = useState("")
+    console.log(activeSubCategory)
     console.log(activeCategory);
 
     const addCategory = (e) => {
@@ -54,7 +56,9 @@ const CustomizeCategory = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
+                console.log("main cat==>", res.filter((category) => category.parent_id === null));
+                console.log("sub cat==>", res.filter((category) => category.parent_id !== null && category.subcategories.length === 1));
+                console.log("subsub cat==>", res.filter((category) => category.parent_id !== null && category.subcategories.length === 0));
                 setCategoryList(
                     res.filter((category) => category.parent_id === null)
                 );
@@ -94,6 +98,7 @@ const CustomizeCategory = () => {
     const getAllSubCategories = () => {
         const data = new FormData();
         data.append("org_id", userInfo?.organizationData?.org_id);
+        // data.append("parent_id", activeSubCategory);
         fetch(`${import.meta.env.VITE_SERVER}/product/getAllSubcategoriesForOrg`, {
             method: "POST",
             body: data,
@@ -111,7 +116,7 @@ const CustomizeCategory = () => {
     useEffect(() => {
         getAllCategories();
         getAllSubCategories();
-    }, [userInfo, update]);
+    }, [userInfo, update, activeSubCategory]);
 
 
 
@@ -261,7 +266,7 @@ const CustomizeCategory = () => {
                     </label>
                     {subCategoryList.map((category) => (
                         <div
-                            onClick={() => setActiveCategory(category.category_id)}
+                            onClick={() => setActiveSubCategory(category.category_id)}
                             className={`d-flex justify-content-between align-items-center  p-2 rounded-2 cursor-pointer  ${activeCategory
                                 ? activeCategory === category.category_id ? "bg-light3" : ""
                                 : ""
