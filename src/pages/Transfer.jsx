@@ -30,18 +30,18 @@ const Transfer = () => {
     },
     {
       name: "Product ID",
-      selector: (row) => row.variation_id,
+      selector: (row) => row.product_id,
       width: "15%",
     },
     {
       name: "Product Name",
-      selector: (row) => row.product_name,
+      selector: (row) => row.name,
       width: "20%",
     },
 
     {
       name: "Quantity",
-      selector: (row) => row.transfer_qty,
+      selector: (row) => row.qty,
       sortable: true,
       width: "10%",
     },
@@ -57,7 +57,7 @@ const Transfer = () => {
     },
     {
       name: "Transfer Date",
-      selector: (row) => row.date,
+      selector: (row) => JSON.stringify(row.createdAt).slice(10, 20),
       width: "20%",
     },
 
@@ -106,24 +106,26 @@ const Transfer = () => {
 
   const getAllTransfers = () => {
     const data = new FormData();
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getAllMainTransferWithStoreName`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/stock/getTransferHistory`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         if (searchField) {
           setData(
-            res.message.filter(
+            res.filter(
               (item) =>
-                item.variation_id.toLowerCase().includes(searchField) ||
-                item.product_name
+                item?.product_id.toLowerCase().includes(searchField) ||
+                item?.name
                   .toLowerCase()
                   .includes(searchField.toLowerCase())
             )
           );
         } else {
-          setData(res.message);
+          setData(res);
         }
       })
       .catch((err) => console.log(err));
@@ -366,7 +368,7 @@ const Transfer = () => {
                                   <div className="col-lg-4 pt-2">
                                     {
                                       item?.attributeIds?.map((name, i) => (
-                                        <p key={name} className="d-inline bg-success p-2 rounded-2 me-2">a{name}</p>
+                                        <p key={name} className="d-inline border p-1 rounded-2 me-2 fw-semibold font-16 bg-light2">{name}</p>
                                       ))
                                     }
 
@@ -531,7 +533,7 @@ const Transfer = () => {
                     data={data}
                     dense
                     pagination
-                    paginationPerPage={5}
+                    paginationPerPage={10}
                     center
                     customStyles={customStyles}
                   />
