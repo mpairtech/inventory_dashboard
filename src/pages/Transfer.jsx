@@ -57,7 +57,7 @@ const Transfer = () => {
     },
     {
       name: "Transfer Date",
-      selector: (row) => JSON.stringify(row.createdAt).slice(10, 20),
+      selector: (row) => new Date(row.createdAt.$date).toLocaleDateString(),
       width: "20%",
     },
 
@@ -65,6 +65,7 @@ const Transfer = () => {
   const { userInfo } = useAuth();
 
   const [data, setData] = useState([]);
+  console.log(data)
   const [transferTo, setTransferTo] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
   console.log(selectedProducts)
@@ -106,7 +107,6 @@ const Transfer = () => {
 
   const getAllTransfers = () => {
     const data = new FormData();
-    data.append("org_id", userInfo?.organizationData?.org_id);
     fetch(`${import.meta.env.VITE_SERVER}/stock/getTransferHistory`, {
       method: "POST",
       body: data,
@@ -114,19 +114,7 @@ const Transfer = () => {
       .then((res) => res.json())
       .then((res) => {
         console.log(res)
-        if (searchField) {
-          setData(
-            res.filter(
-              (item) =>
-                item?.product_id.toLowerCase().includes(searchField) ||
-                item?.name
-                  .toLowerCase()
-                  .includes(searchField.toLowerCase())
-            )
-          );
-        } else {
-          setData(res);
-        }
+        setData(res);
       })
       .catch((err) => console.log(err));
   };
@@ -367,8 +355,8 @@ const Transfer = () => {
                                   </div>
                                   <div className="col-lg-4 pt-2">
                                     {
-                                      item?.attributeIds?.map((name, i) => (
-                                        <p key={name} className="d-inline border p-1 rounded-2 me-2 fw-semibold font-16 bg-light2">{name}</p>
+                                      item?.attributeIds.map((id, i) => (
+                                        <p className="d-inline bg-success p-2 rounded-2 me-2">{id}</p>
                                       ))
                                     }
 

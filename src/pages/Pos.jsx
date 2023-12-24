@@ -11,29 +11,50 @@ import { Pagination, Navigation } from 'swiper/modules';
 import { useAuth } from "../providers/AuthProvider";
 
 const Pos = () => {
+  const [updateCount, setUpdateCount] = useState(0);
 
-  const { userInfo } = useAuth();
-  console.log(userInfo);
   const myRef = useRef(null);
+  const [show, setShow] = useState(false);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
+  const [customerShow, setCustomerShow] = useState(false);
+
+  // Function to open the customer info modal
+  const openCustomerModal = () => {
+    setShowCustomerModal(true);
+  };
+
+  // Function to close the customer info modal
+  const closeCustomerModal = () => {
+    setShowCustomerModal(false);
+  };
+  const { userInfo } = useAuth();
+
+  console.log(userInfo);
 
   const [refTotal, setRefTotal] = useState();
-  const [searchedProduct, setSearchedProduct] = useState([]);
-  const [cate, setCate] = useState([]);
-  const [searchText, setSearch] = useState("");
-  const [show, setShow] = useState(false);
+
+  const [searchedProducts, setSearchedProducts] = useState([]);
+
+
+  const [searchCustomerText, setSearchCustomerText] = useState("");
+
+  const [searchText, setSearchText] = useState("");
+
+
+  const [saleId, setSaleId] = useState("");
+
+  const [allCustomers, setAllCustomers] = useState([]);
+  
+  const [customerId, setCustomerId] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerMobile, setCustomerMobile] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  
   const [items, setItems] = useState([]);
-  const [coun, setCoun] = useState(0);
   const [total, setTotal] = useState(0);
   const [dis, setDis] = useState(0);
   const [ultDiscountAmount, setUltDiscountAmount] = useState(0);
-  const [type, setType] = useState("");
-  const [cid, setCid] = useState("");
-  const [saleId, setSaleId] = useState("");
-  const [cname, setCname] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [allCustomers, setAllCustomers] = useState([]);
-
   const [cashMode, setCashMode] = useState("active");
   const [cardMode, setCardMode] = useState("inactive");
   const [otherMode, setOtherMode] = useState("inactive");
@@ -43,13 +64,16 @@ const Pos = () => {
   const [referredBy, setReferredBy] = useState("");
   const [invoice, setInvoice] = useState({});
 
+
+
+
   const getLastProductId = () => {
     fetch(`${import.meta.env.VITE_SERVER}/getLastAddedCustomer`, {
       method: "POST",
     })
       .then((res) => res.json())
       .then((res) => {
-        setCid("C" + (new Date().getFullYear() % 100) + "00" + res.id);
+        setCustomerId("C" + (new Date().getFullYear() % 100) + "00" + res.id);
       })
       .catch((err) => console.log(err));
   };
@@ -72,20 +96,20 @@ const Pos = () => {
 
   const handleAddNewCustomer = () => {
     const data = new FormData();
-    data.append("c_id", cid);
-    data.append("c_name", cname);
-    data.append("c_phone", phone);
-    data.append("c_add", address);
+    data.append("c_id", customerId);
+    data.append("c_name", customerName);
+    data.append("c_phone", customerMobile);
+    data.append("c_add", customerAddress);
     // field validation
-    if (cname === "") {
+    if (customerName === "") {
       toast.error("Customer name is required !");
       return;
     }
-    if (phone === "") {
+    if (customerMobile === "") {
       toast.error("Customer phone is required !");
       return;
     }
-    if (address === "") {
+    if (customerAddress === "") {
       toast.error("Customer address is required !");
       return;
     }
@@ -111,15 +135,12 @@ const Pos = () => {
       .catch((err) => console.log(err));
   }, [searchText]);
 
-  const [pos, setPos] = useState("");
 
-  const [showCustomerModal, setShowCustomerModal] = useState(false);
-  const [customerShow, setCustomerShow] = useState(false);
   const [discountPercent, setDiscountPercent] = useState("active");
   const [fixedDiscount, setFixedDiscount] = useState("");
-  const [cash, setCash] = useState("");
-  const [card, setCard] = useState("");
-  const [other, setOther] = useState("");
+  const [cashAmount, setCashAmount] = useState("");
+  const [cardAmount, setCardAmount] = useState("");
+  const [otherAmount, setOtherAmount] = useState("");
 
   useEffect(() => {
     //get the total amount from myRef
@@ -127,17 +148,9 @@ const Pos = () => {
       setRefTotal(parseFloat(myRef.current.innerText));
       setUltDiscountAmount(total - (total - total * (dis / 100)));
     }
-  }, [dis, fixedDiscount, coun, items]);
+  }, [dis, fixedDiscount, updateCount, items]);
 
-  // Function to open the customer info modal
-  const openCustomerModal = () => {
-    setShowCustomerModal(true);
-  };
 
-  // Function to close the customer info modal
-  const closeCustomerModal = () => {
-    setShowCustomerModal(false);
-  };
 
   useEffect(() => {
     if (localStorage.getItem("items") != null) {
@@ -153,10 +166,10 @@ const Pos = () => {
       setDis(0);
       // setVat(0);
     }
-  }, [coun]);
-  // }, [JSON.parse(localStorage.getItem("items")), coun]);
+  }, [updateCount]);
 
-  useEffect(() => {
+
+  const getSearchedProduct = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
     data.append("searchTerm", searchText);
@@ -166,49 +179,56 @@ const Pos = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        setSearchedProduct(res);
+        console.log(res)
+        setSearchedProducts(res);
       })
       .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getSearchedProduct();
   }, [searchText]);
 
-  function addcart(im, x, p_id, y, p, z, m) {
-    var item = {
-      img: im,
-      name: x,
+  function addToLocalCart(p_id, name, images, quantity, price, total_quantity, attributeIds, des) {
+    console.log(p_id, name, images, quantity, price, total_quantity, attributeIds, des)
+    var productItem = {
       p_id: p_id,
-      quantity: y,
-      price: p,
-      id: z,
-      total: m,
+      name: name,
+      images: images,
+      quantity: quantity,
+      price: price,
+      total_quantity: total_quantity,
+      attributeIds: attributeIds,
+      des: des,
     };
     var items = [];
 
     if (localStorage.getItem("items") == null) {
-      items.push(item);
+      items.push(productItem);
       localStorage.setItem("items", JSON.stringify(items));
     } else {
-      var all = JSON.parse(localStorage.getItem("items"));
-      all.push(item);
-      localStorage.setItem("items", JSON.stringify(all));
+      var productItemArray = JSON.parse(localStorage.getItem("items"));
+      productItemArray.push(productItem);
+      localStorage.setItem("items", JSON.stringify(productItemArray));
     }
-    setCoun(coun + 1);
+    setUpdateCount(updateCount + 1);
     document.getElementById("fname").value = "";
   }
 
-  function clearcart() {
+  function clearCart() {
     localStorage.removeItem("items");
-    setCoun(coun + 1);
+    setUpdateCount(updateCount + 1);
 
-    toast.success("Cart cleared !", {
+    toast.success("Cart cleared!", {
       icon: "✅",
     });
 
     setTotal(0);
     setDis(0);
     // setVat(0);
-    setCash("");
-    setCard("");
-    setOther("");
+    setCashAmount("");
+    setCardAmount("");
+    setOtherAmount("");
     setFixedDiscount("");
     setUltDiscountAmount(0);
   }
@@ -218,15 +238,15 @@ const Pos = () => {
       document.getElementById("fname").focus();
       var i = document.getElementById("fname").value;
 
-      searchedProduct.map((item) => {
+      searchedProducts.map((item) => {
         if (item.id == i) {
-          addcart(item.product_name, 10, 10, 10, 10);
+          addToLocalCart(item.product_name, 10, 10, 10, 10);
         }
       });
     }
   });
 
-  const [invoiceLoading, setInvoiceLoading] = useState(false);
+
   const [employeeList, setEmployeeList] = useState([]);
 
   const getAllEmployee = () => {
@@ -247,8 +267,10 @@ const Pos = () => {
     getAllEmployee();
   }, [userInfo.store_id]);
 
-  function sellentry() {
-    if (refTotal !== +cash + +card + +other) {
+  console.log(Math.random().toString(36).substr(2, 9))
+
+  function handleSubmitSale() {
+    if (refTotal !== +cashAmount + +cardAmount + +otherAmount) {
       toast.error("Please check amount!");
       return;
     } else {
@@ -256,21 +278,38 @@ const Pos = () => {
         toast.error("Please Enter sold by name!");
         return;
       }
-      if (+cash + +card + +other === 0) {
+      if (+cashAmount + +cardAmount + +otherAmount === 0) {
         toast.error("Please Enter cash amount!");
         return;
       }
       setInvoiceLoading(false);
+
       const data = new FormData();
-      data.append("sale_id", saleId);
+      // sale_id,
+      // store_id,
+      // c_id,
+      // c_name,
+      // c_number,
+      // c_address,
+      // total_payable,
+      // total_paid,
+      // discount_type,
+      // discount,
+      // payment_mode,
+      // cash_paid,
+      // bank_paid,
+      // other_paid,
+      // sold_by,
+      // refered_by
+      data.append("sale_id", Math.random().toString(36).substr(2, 9));
       data.append("store_id", userInfo.store_id);
-      data.append("store_name", storeInfo.name);
-      data.append("customer_id", cid);
-      data.append("customer_name", cname);
-      data.append("customer_phone", phone);
-      data.append("subtotal", total);
+      // data.append("store_name", storeInfo.name);
+      data.append("c_id", customerId);
+      data.append("c_name", customerName);
+      data.append("c_number", customerMobile);
+      // data.append("subtotal", total);
       data.append("d_type", discountPercent);
-      data.append("d_percent", dis);
+      data.append("discount", dis);
       data.append(
         "d_amount",
         parseFloat(fixedDiscount) ||
@@ -278,14 +317,14 @@ const Pos = () => {
       );
       data.append("vat", 0);
       data.append("total_amount", refTotal);
-      data.append("pmode_c", cashMode);
-      data.append("pmode_bc", cardMode);
-      data.append("pmode_o", otherMode);
+      // data.append("pmode_c", cashMode);
+      // data.append("pmode_bc", cardMode);
+      // data.append("pmode_o", otherMode);
       data.append("bc_type", bctype);
       data.append("o_type", btype);
-      data.append("c_amount", cash);
-      data.append("bc_amount", card);
-      data.append("o_amount", other);
+      data.append("c_amount", cashAmount);
+      data.append("bc_amount", cardAmount);
+      data.append("o_amount", otherAmount);
       data.append("sold_by", soldBy);
       data.append("referred_by", referredBy);
 
@@ -331,10 +370,10 @@ const Pos = () => {
                           setInvoice(res);
                           setInvoiceLoading(true);
                           localStorage.removeItem("items");
-                          setCoun(coun + 1);
-                          setCash("");
-                          setCard("");
-                          setOther("");
+                          setUpdateCount(updateCount + 1);
+                          setCashAmount("");
+                          setCardAmount("");
+                          setOtherAmount("");
                         }
                       })
                       .catch((err) => console.log(err));
@@ -355,7 +394,7 @@ const Pos = () => {
     }
   }
 
-  function upquan(index, i) {
+  function increaseItem(index, i) {
     i++;
     var items = JSON.parse(localStorage.getItem("items"));
     items[index].quantity = i;
@@ -367,10 +406,11 @@ const Pos = () => {
     } else {
       localStorage.setItem("items", JSON.stringify(items));
     }
-    setCoun(coun + 1);
+    setUpdateCount(updateCount + 1);
   }
 
-  function upquan2(index, i) {
+  function decreaseItem(index, i) {
+    console.log(i, "hi")
     i--;
     if (i < 1) {
       i = 1;
@@ -378,14 +418,15 @@ const Pos = () => {
     var items = JSON.parse(localStorage.getItem("items"));
     items[index].quantity = i;
     localStorage.setItem("items", JSON.stringify(items));
-    setCoun(coun + 1);
+    setUpdateCount(updateCount + 1);
   }
 
-  function delit(x) {
+  function removeItem(x) {
+    console.log("hi", x)
     var all = JSON.parse(localStorage.getItem("items"));
     all.splice(x, 1);
     localStorage.setItem("items", JSON.stringify(all));
-    setCoun(coun + 1);
+    setUpdateCount(updateCount + 1);
   }
 
   const printPDF = () => {
@@ -403,7 +444,9 @@ const Pos = () => {
 
 
   const [categories, setCategories] = useState([]);
+
   const [data, setData] = useState([]);
+
   console.log(data);
   const [activeCategory, setActiveCategory] = useState(0);
 
@@ -462,8 +505,8 @@ const Pos = () => {
           <div className="col-lg-8 mt-3" style={{ position: "relative" }}>
             <div className="p-3">
               <div className='d-flex align-content-center '>
-                <p className=" me-2 cursor-pointer" onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
-                <p className='fs-5 fw-bold '>Categories</p>
+                <p className="mt-1 me-2 cursor-pointer" onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
+                <p className='fs-5 fw-bold'>Categories</p>
                 <div
                   style={
                     {
@@ -536,14 +579,15 @@ const Pos = () => {
                       <div
                         key={index} className='col-lg-4 cursor-pointer'
                         onClick={() => {
-                          addcart(
-                            item.imgSrc_1,
-                            item.pname,
+                          addToLocalCart(
                             item.product_id,
+                            item.name,
+                            item.images,
                             1,
                             item.price,
-                            item.product_id,
-                            item.product_qty
+                            item.qty,
+                            item.attributeIds,
+                            item.des
                           );
                         }}
                       >
@@ -555,7 +599,7 @@ const Pos = () => {
                             width={70}
                             alt="" />
                           <div>
-                            <p className='font-14 m-0 fw-semibold'> {item.pname}</p>
+                            <p className='font-14 m-0 fw-semibold'> {item.pname} {item.attributeIds}</p>
                             <p className='font-12 m-0 pos-card-price'> {item.price} $</p>
                           </div>
                         </div>
@@ -584,9 +628,15 @@ const Pos = () => {
                       <input
                         type="text"
                         onChange={(e) => {
-                          setSearch(e.target.value);
+                          setSearchText(e.target.value);
                           setShow(true);
                         }}
+                        onFocus={
+                          () =>
+                            setTimeout(() => {
+                              setShow(true)
+                            }, 200)
+                        }
                         placeholder="Search Product"
                         className="form-control px-5 shadow-none"
                       />
@@ -604,30 +654,22 @@ const Pos = () => {
                         }}
                         className="shadow-lg mb-0 pb-0  rounded"
                       >
-                        {searchedProduct
-                          .filter((item) => {
-                            const productNameMatch = item.name
-                              ?.toLowerCase()
-                              .includes(searchText?.toLowerCase());
-                            const variationIdMatch = item.product_id
-                              ?.toLowerCase()
-                              .includes(searchText.toLowerCase());
-                            return productNameMatch || variationIdMatch;
-                          })
+                        {searchedProducts
                           .map((item, index) => (
                             <div
                               key={item.product_id}
-                              className="pb-0 mb-2 ps-2 hover_effect"
+                              className="pb-0 mb-2 ps-2 hover_effect border "
                               onClick={() => {
                                 setShow(false);
-                                addcart(
-                                  item.imgSrc_1,
-                                  item.name,
+                                addToLocalCart(
                                   item.product_id,
+                                  item.name,
+                                  item.images,
                                   1,
                                   item.price,
-                                  item.product_id,
-                                  item.qty
+                                  item.qty,
+                                  item.attributeIds,
+                                  item.des
                                 );
                               }}
                               style={{ cursor: "pointer", zIndex: 999 }}
@@ -637,6 +679,7 @@ const Pos = () => {
                               </p>
                             </div>
                           ))}
+
                       </div>
                     ) : null}
                     <div className="px-asm">
@@ -675,13 +718,18 @@ const Pos = () => {
                                   <div className="w-50">
                                     {" "}
                                     <p className="font-14 fw-semibold mb-1">
-                                      {item.name}
+                                      {item.name} <span className="text-info">({(item.attributeIds)
+                                        .map((item) => {
+                                          return item;
+                                        })
+                                        .join(", ")
+                                      })</span>
                                     </p>
                                     <p className="font-12 mb-1">
                                       {item.id}
                                     </p>
                                     <p className="font-14 pos-card-price fw-bold mb-2">
-                                      {item.price}$
+                                      Price: {item.price}$
                                     </p>
                                   </div>
                                 </div>
@@ -692,7 +740,7 @@ const Pos = () => {
                                     value="+"
                                     className="btn_small px-2 fs-6 py-0 me-2"
                                     data-field="quantity"
-                                    onClick={() => upquan(index, item.quantity)}
+                                    onClick={() => increaseItem(index, item.quantity)}
                                   />
                                   <input
                                     type="number"
@@ -707,14 +755,14 @@ const Pos = () => {
                                     value="-"
                                     className="btn_small px-2 fs-6 py-0"
                                     data-field="quantity"
-                                    onClick={() => upquan2(index, item.quantity)}
+                                    onClick={() => decreaseItem(index, item.quantity)}
                                   />
                                 </div>
 
                                 <div className=" text-end me-3">
                                   <button
                                     className="border-0 bg-white "
-                                    onClick={() => delit(index)}
+                                    onClick={() => removeItem(index)}
                                   >
                                     <i className="fa-solid fa-xmark text-danger fa-lg"></i>
                                   </button>
@@ -792,7 +840,7 @@ const Pos = () => {
                                       id="message-text"
                                       placeholder="Search by name"
                                       onChange={(e) => {
-                                        setSearch(e.target.value);
+                                        setSearchCustomerText(e.target.value);
                                         setCustomerShow(true);
                                       }}
                                     />
@@ -841,7 +889,7 @@ const Pos = () => {
                                                   type="text"
                                                   className="form-control py-1 font-14 bg-light shadow-none"
                                                   onChange={(e) =>
-                                                    setCname(e.target.value)
+                                                    setCustomerName(e.target.value)
                                                   }
                                                 />
                                               </div>
@@ -856,7 +904,7 @@ const Pos = () => {
                                                   type="text"
                                                   className="form-control py-1 font-14 bg-light shadow-none"
                                                   onChange={(e) =>
-                                                    setPhone(e.target.value)
+                                                    setCustomerMobile(e.target.value)
                                                   }
                                                 />
                                               </div>
@@ -872,7 +920,7 @@ const Pos = () => {
                                                 type="text"
                                                 className="form-control py-1 font-14 bg-light shadow-none"
                                                 onChange={(e) =>
-                                                  setAddress(e.target.value)
+                                                  setCustomerAddress(e.target.value)
                                                 }
                                               />
                                             </div>
@@ -926,9 +974,9 @@ const Pos = () => {
                                           key={item.c_id}
                                           className="pb-0 mb-2 ps-2"
                                           onClick={() => {
-                                            setCname(item.c_name);
-                                            setPhone(item.c_phone);
-                                            setAddress(item.c_add);
+                                            setCustomerName(item.c_name);
+                                            setCustomerMobile(item.c_phone);
+                                            setCustomerAddress(item.c_add);
                                             // setSelectedProduct(item.c_id);
                                             // addcart(item.pname, 1, item.price, item.product_id, item.qty);
                                             setCustomerShow(false);
@@ -950,8 +998,8 @@ const Pos = () => {
                                     </label>
                                     <input
                                       type="text"
-                                      value={cname}
-                                      onChange={(e) => setCname(e.target.value)}
+                                      value={customerName}
+                                      onChange={(e) => setCustomerName(e.target.value)}
                                       className="form-control py-1 font-14 bg-light shadow-none"
                                       id="exampleInputEmail1"
                                       aria-describedby="emailHelp"
@@ -965,9 +1013,9 @@ const Pos = () => {
                                       Phone
                                     </label>
                                     <input
-                                      value={phone}
+                                      value={customerMobile}
                                       type="text"
-                                      onChange={(e) => setPhone(e.target.value)}
+                                      onChange={(e) => setCustomerMobile(e.target.value)}
                                       className="form-control py-1 font-14 bg-light shadow-none"
                                       id="exampleInputPassword1"
                                     />
@@ -981,9 +1029,9 @@ const Pos = () => {
                                     Address
                                   </label>
                                   <input
-                                    value={address}
+                                    value={customerAddress}
                                     type="text"
-                                    onChange={(e) => setAddress(e.target.value)}
+                                    onChange={(e) => setCustomerAddress(e.target.value)}
                                     className="form-control py-1 font-14 bg-light shadow-none"
                                     id="exampleInputPassword1"
                                   />
@@ -1147,8 +1195,8 @@ const Pos = () => {
                         </span>
                       </div>
                       <input
-                        value={cash}
-                        onChange={(e) => setCash(e.target.value)}
+                        value={cashAmount}
+                        onChange={(e) => setCashAmount(e.target.value)}
                         disabled={cashMode === "active" ? false : true}
                         className="w-35 form-control font-14 py-1 rounded-1 shadow-none text-end"
                         type="number"
@@ -1193,7 +1241,7 @@ const Pos = () => {
                         </option>
                       </select>
                       <input
-                        onChange={(e) => setCard(e.target.value)}
+                        onChange={(e) => setCardAmount(e.target.value)}
                         disabled={cardMode === "active" ? false : true}
                         className="w-35 text-end  form-control font-14 py-1 rounded-1 shadow-none"
                         type="number"
@@ -1229,7 +1277,7 @@ const Pos = () => {
                         <option value="others">Others</option>
                       </select>
                       <input
-                        onChange={(e) => setOther(e.target.value)}
+                        onChange={(e) => setOtherAmount(e.target.value)}
                         disabled={otherMode === "active" ? false : true}
                         className="w-35 text-end  form-control font-14 py-1 rounded-1 shadow-none"
                         type="number"
@@ -1242,7 +1290,7 @@ const Pos = () => {
                   <div className="d-flex ">
                     <p className="font-24 fw-bold me-3">Total Paid</p>
                     <p className="font-24 fw-semibold text-danger ">
-                      {parseFloat(+cash + +card + +other).toFixed(2)} BDT
+                      {parseFloat(+cashAmount + +cardAmount + +otherAmount).toFixed(2)} BDT
                     </p>
                   </div>
                 </div>
@@ -1332,7 +1380,7 @@ const Pos = () => {
                         </button>
                       ) : (
                         <button
-                          onClick={sellentry}
+                          onClick={handleSubmitSale}
                           className="btn_primary border-0 text-white py-2 font-16 rounded-1 w-100"
                         >
                           Confirm Sale
