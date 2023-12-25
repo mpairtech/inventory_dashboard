@@ -38,19 +38,18 @@ const Pos = () => {
 
 
   const [searchCustomerText, setSearchCustomerText] = useState("");
-
   const [searchText, setSearchText] = useState("");
 
 
   const [saleId, setSaleId] = useState("");
 
   const [allCustomers, setAllCustomers] = useState([]);
-  
+
   const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerMobile, setCustomerMobile] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
-  
+
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [dis, setDis] = useState(0);
@@ -58,11 +57,12 @@ const Pos = () => {
   const [cashMode, setCashMode] = useState("active");
   const [cardMode, setCardMode] = useState("inactive");
   const [otherMode, setOtherMode] = useState("inactive");
-  const [btype, setBtype] = useState("");
-  const [bctype, setBCtype] = useState("");
+  const [bankCardType, setBankCardType] = useState("");
+  const [otherType, setOtherType] = useState("");
   const [soldBy, setSoldBy] = useState("");
   const [referredBy, setReferredBy] = useState("");
-  const [invoice, setInvoice] = useState({});
+
+  const [invoiceData, setInvoiceData] = useState({});
 
 
 
@@ -96,10 +96,12 @@ const Pos = () => {
 
   const handleAddNewCustomer = () => {
     const data = new FormData();
-    data.append("c_id", customerId);
-    data.append("c_name", customerName);
-    data.append("c_phone", customerMobile);
-    data.append("c_add", customerAddress);
+    // data.append("c_id", customerId ?? "C" + (new Date().getFullYear() % 100) + "00" + Math.floor(Math.random() * 1000000) + 1);
+    data.append("name", customerName);
+    data.append("number", customerMobile);
+    data.append("address", customerAddress);
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    data.append("user_id", userInfo.user_id);
     // field validation
     if (customerName === "") {
       toast.error("Customer name is required !");
@@ -113,27 +115,66 @@ const Pos = () => {
       toast.error("Customer address is required !");
       return;
     }
-    fetch(`${import.meta.env.VITE_SERVER}/addNewCustomer`, {
+    fetch(`${import.meta.env.VITE_SERVER}/customer/addCustomer`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
-      .then((res) => console.log(res.message))
+      .then((res) => {
+        if (res.name) {
+          setCustomerName("");
+          setCustomerMobile("");
+          setCustomerAddress("");
+          toast.success("Customer added !");
+        } else {
+          toast.error(res.message);
+        }
+      }
+
+      )
       .catch((err) => toast.error(err.message));
 
-    toast.success("Customer added !");
   };
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_SERVER}/getAllCustomers`, {
+  const getSearchCustomer = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    data.append("searchTerm", searchCustomerText);
+    fetch(`${import.meta.env.VITE_SERVER}/customer/getSearchCustomers`, {
       method: "POST",
     })
       .then((res) => res.json())
       .then((res) => {
-        setAllCustomers(res.message);
+          console.log(res)
+          setAllCustomers(res);
       })
       .catch((err) => console.log(err));
-  }, [searchText]);
+  };
+
+  useEffect(() => {
+    getSearchCustomer();
+  }, [searchCustomerText]);
+
+
+  const [employeeList, setEmployeeList] = useState([]);
+
+  const getAllEmployee = () => {
+    const data = new FormData();
+    data.append("store_id", userInfo.store_id);
+    fetch(`${import.meta.env.VITE_SERVER}/getAllEmployeeByStoreId`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setEmployeeList(res.message);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getAllEmployee();
+  }, [userInfo.store_id]);
 
 
   const [discountPercent, setDiscountPercent] = useState("active");
@@ -150,7 +191,7 @@ const Pos = () => {
     }
   }, [dis, fixedDiscount, updateCount, items]);
 
-
+  console.log(items)
 
   useEffect(() => {
     if (localStorage.getItem("items") != null) {
@@ -247,37 +288,19 @@ const Pos = () => {
   });
 
 
-  const [employeeList, setEmployeeList] = useState([]);
-
-  const getAllEmployee = () => {
-    const data = new FormData();
-    data.append("store_id", userInfo.store_id);
-    fetch(`${import.meta.env.VITE_SERVER}/getAllEmployeeByStoreId`, {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setEmployeeList(res.message);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  useEffect(() => {
-    getAllEmployee();
-  }, [userInfo.store_id]);
 
   console.log(Math.random().toString(36).substr(2, 9))
 
   function handleSubmitSale() {
     if (refTotal !== +cashAmount + +cardAmount + +otherAmount) {
+      console.log(refTotal, +cashAmount + +cardAmount + +otherAmount)
       toast.error("Please check amount!");
       return;
     } else {
-      if (soldBy === "") {
-        toast.error("Please Enter sold by name!");
-        return;
-      }
+      // if (soldBy === "") {
+      //   toast.error("Please Enter sold by name!");
+      //   return;
+      // }
       if (+cashAmount + +cardAmount + +otherAmount === 0) {
         toast.error("Please Enter cash amount!");
         return;
@@ -285,73 +308,60 @@ const Pos = () => {
       setInvoiceLoading(false);
 
       const data = new FormData();
-      // sale_id,
-      // store_id,
-      // c_id,
-      // c_name,
-      // c_number,
-      // c_address,
-      // total_payable,
-      // total_paid,
-      // discount_type,
-      // discount,
-      // payment_mode,
-      // cash_paid,
-      // bank_paid,
-      // other_paid,
-      // sold_by,
-      // refered_by
-      data.append("sale_id", Math.random().toString(36).substr(2, 9));
-      data.append("store_id", userInfo.store_id);
+
+      // data.append("sale_id", Math.random().toString(36).substr(2, 9));
+      data.append("store_id", "motherStoreId001");
       // data.append("store_name", storeInfo.name);
-      data.append("c_id", customerId);
+      data.append("c_id", "C111111")
       data.append("c_name", customerName);
       data.append("c_number", customerMobile);
-      // data.append("subtotal", total);
-      data.append("d_type", discountPercent);
+      data.append("total_paid", total);
+      data.append("discount_type", discountPercent);
       data.append("discount", dis);
       data.append(
         "d_amount",
         parseFloat(fixedDiscount) ||
         parseFloat(total - (total - total * (dis / 100)))
       );
-      data.append("vat", 0);
-      data.append("total_amount", refTotal);
-      // data.append("pmode_c", cashMode);
-      // data.append("pmode_bc", cardMode);
-      // data.append("pmode_o", otherMode);
-      data.append("bc_type", bctype);
-      data.append("o_type", btype);
-      data.append("c_amount", cashAmount);
-      data.append("bc_amount", cardAmount);
-      data.append("o_amount", otherAmount);
-      data.append("sold_by", soldBy);
+      data.append("total_payable", refTotal);
+      data.append("payment_mode_cash", cashMode);
+      data.append("payment_mode_card", cardMode);
+      data.append("payment_mode_other", otherMode);
+      data.append("bc_type", bankCardType);
+      data.append("o_type", otherType);
+      data.append("cash_paid", cashAmount);
+      data.append("bank_paid", cardAmount);
+      data.append("other_paid", otherAmount);
+      // data.append("sold_by", soldBy);
+      data.append("sold_by", "asm");
       data.append("referred_by", referredBy);
 
-      fetch(`${import.meta.env.VITE_SERVER}/addSalesInfo`, {
+      fetch(`${import.meta.env.VITE_SERVER}/sale/addSalesInfo`, {
         method: "POST",
         body: data,
       })
         .then((res) => res.json())
         .then((res) => {
+          console.log(res)
           if (res.success) {
             setInvoiceLoading(false);
+            console.log(items)
             items?.map((item) => {
               const data = new FormData();
-              data.append("sale_id", saleId);
-              data.append("p_id", item.p_id);
+              data.append("sale_id", res.result.sale_id);
+              data.append("product_id", item.p_id);
               data.append("p_name", item.name);
-              data.append("p_size", (item.id.match(/\(([^)]+)\)/) || [])[1]);
-              data.append("p_qty", item.quantity);
-              data.append("p_var", item.id);
-              data.append("p_price", item.price);
-              data.append("store_id", userInfo.store_id);
-              fetch(`${import.meta.env.VITE_SERVER}/addSalesItem`, {
+              data.append("quantity", item.quantity);
+              data.append("price", item.price);
+              data.append("total_price", item.quantity * +item.price);
+              data.append("store_id", "motherStoreId001");
+              fetch(`${import.meta.env.VITE_SERVER}/sale/addSalesItem`, {
                 method: "POST",
                 body: data,
               })
                 .then((res) => res.json())
                 .then((res) => {
+                  console.log(res)
                   if (res.success) {
                     // toast.success("Product sold !", {
                     //   icon: "🛒",
@@ -367,7 +377,7 @@ const Pos = () => {
                       .then((res) => {
                         if (res.info) {
                           // document.getElementById("mod").click();
-                          setInvoice(res);
+                          setInvoiceData(res);
                           setInvoiceLoading(true);
                           localStorage.removeItem("items");
                           setUpdateCount(updateCount + 1);
@@ -497,122 +507,209 @@ const Pos = () => {
   }, [activeCategory]);
 
   const navigate = useNavigate();
-
+  console.log(items)
   return (
     <>
       <div onClick={() => setShow(false)} className="container-fluid noprint bg-light2" style={{ height: "100vh" }}>
         <div className="row">
-          <div className="col-lg-8 mt-3" style={{ position: "relative" }}>
-            <div className="p-3">
-              <div className='d-flex align-content-center '>
-                <p className="mt-1 me-2 cursor-pointer" onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
-                <p className='fs-5 fw-bold'>Categories</p>
-                <div
-                  style={
-                    {
-                      background: activeCategory == 0 ? "#ffce00" : "",
-                      hover: "#1e90ff",
-                      cursor: "pointer",
+          {
+            activeDiv === "pos" ?
+              <div className="col-lg-8 mt-3 " style={{ position: "relative" }}>
+                {items?.map((item, index) => {
+                  return (
+                    <div key={
+                      item.id
+                    } className="px-2 bg-white rounded-2 ">
+                      <div className="d-flex justify-content-between align-items-center py-2">
+                        <div className="d-flex w-50 ms-2 align-items-center">
+                          <div className="me-3 py-2">
+                            {" "}
+                            <img
+                              src={`${import.meta.env.VITE_IMG}${item.img}`}
+                              className="card-offcanvas-img rounded border border-secondery"
+                              alt=""
+                              width={70}
+                              height={70}
+                            ></img>
+                          </div>
+                          <div className="w-50">
+                            {" "}
+                            <p className="font-14 fw-semibold mb-1">
+                              {item.name} <span className="text-info">({(item.attributeIds)
+                                .map((item) => {
+                                  return item;
+                                })
+                                .join(", ")
+                              })</span>
+                            </p>
+                            <p className="font-12 mb-1">
+                              {item.id}
+                            </p>
+                            <p className="font-14 pos-card-price fw-bold mb-2">
+                              Price: {item.price}$
+                            </p>
+                          </div>
 
-                    }
-                  }
-                  className='ms-3 rounded-pill px-4 py-1 border'
-                  onClick={() => setActiveCategory(0)}
+                          <div className="w-50">
 
-                >
-                  <p className='fw-semibold m-0'>All Category</p>
-                </div>
-              </div>
-
-              <div className='row'>
-
-
-                <Swiper
-                  slidesPerView={1}
-                  spaceBetween={10}
-                  breakpoints={{
-                    640: {
-                      slidesPerView: 2,
-                      spaceBetween: 20,
-                    },
-                    768: {
-                      slidesPerView: 4,
-                      spaceBetween: 40,
-                    },
-                    1024: {
-                      slidesPerView: 6,
-                      spaceBetween: 20,
-                    },
-                  }}
-                  navigation={true} modules={[Navigation]}
-                  className="mySwiper py-3"
-                >
-                  {
-                    categories.map((item, index) => (
-                      <SwiperSlide key={item.id} className="p-1 rounded-3">
-                        <div
-                          key={item.id} className={`rounded-3 border-0 text-center p-3 cursor-pointer hover_effect2 ${activeCategory == item.id ? 'active-category-box' : ''}`}
-                          onClick={() => setActiveCategory(item.id)}
-                        >
-                          <img
-
-                            className='m-1'
-                            src={`${import.meta.env.VITE_IMG}${item.imgSrc}`}
-                            height={40}
-                            width={40}
-                            alt="" />
-                          <p className='font-14 mx-auto mt-1 fw-semibold'> {item.category_name}</p>
-                        </div>
-                      </SwiperSlide>
-                    ))
-                  }
-                </Swiper>
-              </div>
-
-              <div
-                className="mt-3"
-              >
-                <p className='fw-bold mb-2'>Product List</p>
-                <div className='row'>
-                  {
-                    data.map((item, index) => (
-                      <div
-                        key={index} className='col-lg-4 cursor-pointer'
-                        onClick={() => {
-                          addToLocalCart(
-                            item.product_id,
-                            item.name,
-                            item.images,
-                            1,
-                            item.price,
-                            item.qty,
-                            item.attributeIds,
-                            item.des
-                          );
-                        }}
-                      >
-                        <div className='p-2 bg-white shadow-sm border-0 rounded-3 card-hover d-flex mb-3'>
-                          <img
-                            className='pos-product-img me-2'
-                            src={`${import.meta.env.VITE_IMG}${item.imgSrc_1}`}
-                            height={70}
-                            width={70}
-                            alt="" />
-                          <div>
-                            <p className='font-14 m-0 fw-semibold'> {item.pname} {item.attributeIds}</p>
-                            <p className='font-12 m-0 pos-card-price'> {item.price} $</p>
+                            <p className="font-14  fw-medium mb-2">
+                              <span dangerouslySetInnerHTML={{ __html: item.des }}></span>
+                            </p>
                           </div>
                         </div>
 
+                        <div className="w-25">
+                          <input
+                            type="button"
+                            value="+"
+                            className="btn_small px-2 fs-6 py-0 me-2"
+                            data-field="quantity"
+                            onClick={() => increaseItem(index, item.quantity)}
+                          />
+                          <input
+                            type="number"
+                            value={item.quantity}
+                            placeholder="1000 gm"
+                            name="quantity"
+                            className="quantity-field border-0 text-center w-25 fw-medium bg-white me-2"
+                            disabled
+                          />
+                          <input
+                            type="button"
+                            value="-"
+                            className="btn_small px-2 fs-6 py-0"
+                            data-field="quantity"
+                            onClick={() => decreaseItem(index, item.quantity)}
+                          />
+                        </div>
+
+                        <div className=" text-end me-3">
+                          <button
+                            className="border-0 bg-white "
+                            onClick={() => removeItem(index)}
+                          >
+                            <i className="fa-solid fa-xmark text-danger fa-lg"></i>
+                          </button>
+                        </div>
 
                       </div>
-                    ))
-                  }
-                </div>
+                    </div>
+                  );
+                })}
+              </div> :
+              <div className="col-lg-8 mt-3" style={{ position: "relative" }}>
+                <div className="p-3">
+                  <div className='d-flex align-content-center '>
+                    <p className="mt-1 me-2 cursor-pointer" onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
+                    <p className='fs-5 fw-bold'>Categories</p>
+                    <div
+                      style={
+                        {
+                          background: activeCategory == 0 ? "#ffce00" : "",
+                          hover: "#1e90ff",
+                          cursor: "pointer",
 
+                        }
+                      }
+                      className='ms-3 rounded-pill px-4 py-1 border'
+                      onClick={() => setActiveCategory(0)}
+
+                    >
+                      <p className='fw-semibold m-0'>All Category</p>
+                    </div>
+                  </div>
+
+                  <div className='row'>
+
+
+                    <Swiper
+                      slidesPerView={1}
+                      spaceBetween={10}
+                      breakpoints={{
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 20,
+                        },
+                        768: {
+                          slidesPerView: 4,
+                          spaceBetween: 40,
+                        },
+                        1024: {
+                          slidesPerView: 6,
+                          spaceBetween: 20,
+                        },
+                      }}
+                      navigation={true} modules={[Navigation]}
+                      className="mySwiper py-3"
+                    >
+                      {
+                        categories.map((item, index) => (
+                          <SwiperSlide key={item.id} className="p-1 rounded-3">
+                            <div
+                              key={item.id} className={`rounded-3 border-0 text-center p-3 cursor-pointer hover_effect2 ${activeCategory == item.id ? 'active-category-box' : ''}`}
+                              onClick={() => setActiveCategory(item.id)}
+                            >
+                              <img
+
+                                className='m-1'
+                                src={`${import.meta.env.VITE_IMG}${item.imgSrc}`}
+                                height={40}
+                                width={40}
+                                alt="" />
+                              <p className='font-14 mx-auto mt-1 fw-semibold'> {item.category_name}</p>
+                            </div>
+                          </SwiperSlide>
+                        ))
+                      }
+                    </Swiper>
+                  </div>
+
+                  <div
+                    className="mt-3"
+                  >
+                    <p className='fw-bold mb-2'>Product List</p>
+                    <div className='row'>
+                      {
+                        data.map((item, index) => (
+                          <div
+                            key={index} className='col-lg-4 cursor-pointer'
+                            onClick={() => {
+                              addToLocalCart(
+                                item.product_id,
+                                item.name,
+                                item.images,
+                                1,
+                                item.price,
+                                item.qty,
+                                item.attributeIds,
+                                item.des
+                              );
+                            }}
+                          >
+                            <div className='p-2 bg-white shadow-sm border-0 rounded-3 card-hover d-flex mb-3'>
+                              <img
+                                className='pos-product-img me-2'
+                                src={`${import.meta.env.VITE_IMG}${item.imgSrc_1}`}
+                                height={70}
+                                width={70}
+                                alt="" />
+                              <div>
+                                <p className='font-14 m-0 fw-semibold'> {item.pname} {item.attributeIds}</p>
+                                <p className='font-12 m-0 pos-card-price'> {item.price} $</p>
+                              </div>
+                            </div>
+
+
+                          </div>
+                        ))
+                      }
+                    </div>
+
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+          }
+
 
           <div className="col-lg-4">
             {
@@ -837,7 +934,6 @@ const Pos = () => {
                                   <div className="d-flex gap-3">
                                     <input
                                       className="form-control font-13 shadow-none bg-white"
-                                      id="message-text"
                                       placeholder="Search by name"
                                       onChange={(e) => {
                                         setSearchCustomerText(e.target.value);
@@ -928,7 +1024,7 @@ const Pos = () => {
                                           <div className="modal-footer">
                                             <button
                                               type="button"
-                                              className="btn_red py-2 "
+                                              className="btn_secondary py-2 "
                                               data-bs-dismiss="modal"
                                             >
                                               Close
@@ -936,7 +1032,7 @@ const Pos = () => {
                                             <button
                                               data-bs-dismiss="modal"
                                               onClick={handleAddNewCustomer}
-                                              className="btn_green py-2 me-3"
+                                              className="btn_blue py-2 me-3"
                                             >
                                               Add Customer
                                             </button>
@@ -960,30 +1056,19 @@ const Pos = () => {
                                     className="shadow-lg mb-0 pb-0 bg-white  rounded"
                                   >
                                     {allCustomers
-                                      ?.filter((item) => {
-                                        if (
-                                          item.c_name
-                                            ?.toLowerCase()
-                                            .includes(searchText.toLowerCase())
-                                        ) {
-                                          return item;
-                                        }
-                                      })
                                       .map((item, index) => (
                                         <div
                                           key={item.c_id}
                                           className="pb-0 mb-2 ps-2"
                                           onClick={() => {
-                                            setCustomerName(item.c_name);
-                                            setCustomerMobile(item.c_phone);
-                                            setCustomerAddress(item.c_add);
-                                            // setSelectedProduct(item.c_id);
-                                            // addcart(item.pname, 1, item.price, item.product_id, item.qty);
+                                            setCustomerName(item.name);
+                                            setCustomerMobile(item.number);
+                                            setCustomerAddress(item.address);
                                             setCustomerShow(false);
                                           }}
                                           style={{ cursor: "pointer" }}
                                         >
-                                          <p> {item.c_name}</p>
+                                          <p> {item.name}</p>
                                         </div>
                                       ))}
                                   </div>
@@ -1218,7 +1303,7 @@ const Pos = () => {
                         </span>
                       </div>
                       <select
-                        onChange={(e) => setBCtype(e.target.value)}
+                        onChange={(e) => setBankCardType(e.target.value)}
                         style={{ marginRight: "30px" }}
                         className="form-select shadow-none w-25"
                         name=""
@@ -1263,7 +1348,7 @@ const Pos = () => {
                         </span>
                       </div>
                       <select
-                        onChange={(e) => setBtype(e.target.value)}
+                        onChange={(e) => setOtherType(e.target.value)}
                         style={{ marginRight: "39px" }}
                         className="form-select shadow-none w-25"
                         name=""
@@ -1403,7 +1488,7 @@ const Pos = () => {
       </div>
 
       {/* printable div */}
-      {invoice?.info && invoice?.item ? (
+      {invoiceData?.info && invoiceData?.item ? (
         <div
           style={{
             width: "275px",
@@ -1421,13 +1506,13 @@ const Pos = () => {
             <i class="fa-solid fa-location-dot"></i> {storeInfo?.location}
           </p>
           <p className="font-14 text-center my-2 ms-2">
-            #{invoice?.info[0]?.sale_id}
+            #{invoiceData?.info[0]?.sale_id}
           </p>
           <p className="font-12 text-start">
-            Customer Name: {invoice?.info[0]?.customer_name}
+            Customer Name: {invoiceData?.info[0]?.customer_name}
           </p>
           <p className="font-12 text-start">
-            Mobile Number: {invoice?.info[0]?.customer_phone}
+            Mobile Number: {invoiceData?.info[0]?.customer_phone}
           </p>
 
           <table className="table mt-2 ">
@@ -1465,7 +1550,7 @@ const Pos = () => {
               </tr>
             </thead>
             <tbody className="border-0">
-              {invoice?.item?.map((item, index) => (
+              {invoiceData?.item?.map((item, index) => (
                 <tr key={item.id} className="border-bottom">
                   <td width="55%" className="border-0 font-12 text-superdark">
                     {item.p_name} <br />
@@ -1506,7 +1591,7 @@ const Pos = () => {
 
                 <td className="border-0 font-14">
                   <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                    {(invoice?.info[0]?.subtotal).toFixed(2)} BDT
+                    {(invoiceData?.info[0]?.subtotal).toFixed(2)} BDT
                   </p>
                 </td>
               </tr>
@@ -1524,7 +1609,7 @@ const Pos = () => {
 
                 <td className="border-0 font-14">
                   <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                    {(invoice?.info[0]?.d_amount).toFixed(2)} BDT
+                    {(invoiceData?.info[0]?.d_amount).toFixed(2)} BDT
                   </p>
                 </td>
               </tr>
@@ -1542,7 +1627,7 @@ const Pos = () => {
 
                 <td className="border-0 font-14 fw-semibold">
                   <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                    {(invoice?.info[0]?.total_amount).toFixed(2)} BDT
+                    {(invoiceData?.info[0]?.total_amount).toFixed(2)} BDT
                   </p>
                 </td>
               </tr>

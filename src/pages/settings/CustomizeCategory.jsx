@@ -17,7 +17,9 @@ const CustomizeCategory = () => {
     const [img, setImg] = useState("");
     const [name, setName] = useState("");
 
-    const [activeCategory, setActiveCategory] = useState("")
+    const [allCategoriesAll, setAllCategoriesAll] = useState([]);
+    console.log(allCategoriesAll)
+    const [activeCategory, setActiveCategory] = useState(null)
     const [activeSubCategory, setActiveSubCategory] = useState("")
     console.log(activeSubCategory)
     console.log(activeCategory);
@@ -27,10 +29,11 @@ const CustomizeCategory = () => {
         const data = new FormData();
         data.append("img", img);
         data.append("name", name);
+        if (activeCategory) data.append("parent_id", activeCategory);
         data.append("org_id", userInfo?.organizationData?.org_id);
         data.append("user_id", userInfo?.user_id);
 
-        fetch(`${import.meta.env.VITE_SERVER}/product/createCategory`, {
+        fetch(`${import.meta.env.VITE_SERVER}/product/createSubCategory`, {
             method: "POST",
             body: data,
         })
@@ -56,6 +59,7 @@ const CustomizeCategory = () => {
         })
             .then((res) => res.json())
             .then((res) => {
+                setAllCategoriesAll(res);
                 console.log("main cat==>", res.filter((category) => category.parent_id === null));
                 console.log("sub cat==>", res.filter((category) => category.parent_id !== null && category.subcategories.length === 1));
                 console.log("subsub cat==>", res.filter((category) => category.parent_id !== null && category.subcategories.length === 0));
@@ -89,7 +93,7 @@ const CustomizeCategory = () => {
                     toast.success("Category Setup Successfull");
                     setUpdate(!update);
                 } else {
-                    toast.error("Failed to Add User");
+                    toast.error("Failed to Add Category");
                 }
             })
     };
@@ -139,7 +143,7 @@ const CustomizeCategory = () => {
 
     return (
         <div className='container'>
-            <div className="d-flex justify-content-start align-items-start border-bottom pb-3">
+            <div className="d-flex justify-content-start align-items-start pb-3">
                 <div className='row'>
                     <form onSubmit={addCategory} className="col-6 mt-1">
                         <h1 className="fs-5" >
@@ -173,6 +177,23 @@ const CustomizeCategory = () => {
                                         onChange={(e) => setName(e.target.value)}
                                     />
                                 </div>
+                                <div className="">
+                                    <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted fw-500"
+                                    >
+                                        Parent Category
+                                    </label>
+                                    <select
+                                        className='form-control py-2 font-13 shadow-none'
+                                        onChange={(e) => setActiveCategory(e.target.value)}
+                                    >
+                                        <option value={null}>Select Category</option>
+                                        {allCategoriesAll.map((category) => (
+                                            <option value={category.category_id}>{category.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
                             </div>
                         </div>
@@ -195,40 +216,26 @@ const CustomizeCategory = () => {
                     >
                         Category Name
                     </label>
-                    {categoryList.map((category) => (
+                    {allCategoriesAll.map((category) => (
                         <div
-                            onClick={() => setActiveCategory(category.category_id)}
-                            className={`d-flex justify-content-between align-items-center  p-2 rounded-2 cursor-pointer  ${activeCategory
-                                ? activeCategory === category.category_id ? "bg-light3" : ""
-                                : ""
-                                }`}>
-                            <p className="font-13">{category.name}</p>
+                            className={`d-flex justify-content-between align-items-center  p-2 rounded-2`}>
+                            <div className='d-flex align-items-center'>
+                                <span className='font-20'>{' ━ '.repeat(category.depth)} </span> <span className="font-13 ms-2">{category.name}</span>
+                            </div>
                             <i className="fas fa-trash-alt cursor-pointer" onClick={() => handleDelete(category.category_id)}></i>
                         </div>
                     ))}
                 </div>
             </div>
-            <div className="d-flex justify-content-start align-items-start border-bottom pt-2">
+            {/* <div className="d-flex justify-content-start align-items-start border-bottom pt-2">
                 <div className='row'>
-                    <form onSubmit={addSubCategory} className="col-6 mt-1">
+                    <form onSubmit={addSubCategory} className="col-12 mt-1">
                         <h1 className="fs-5" >
                             Customize Sub Category
                         </h1>
                         <div className=""
                         >
                             <div className="row">
-                                <div className="">
-                                    <label
-                                        htmlFor="recipient-name"
-                                        className="col-form-label text-muted fw-500"
-                                    >Upload Logo</label>
-
-                                    <input type="file" className="form-control py-2 font-13 shadow-none bg-white"
-                                        onChange={(e) => {
-                                            setImg(e.target.files[0]);
-                                        }}
-                                    />
-                                </div>
                                 <div className="">
                                     <label
                                         htmlFor="recipient-name"
@@ -256,13 +263,14 @@ const CustomizeCategory = () => {
                     </form>
 
                 </div>
-
+                <div className="col-2">
+                </div>
                 <div className="col-2">
                     <label
                         htmlFor="recipient-name"
                         className="col-form-label text-muted fw-500"
                     >
-                        Category Name
+                        Sub Category Name
                     </label>
                     {subCategoryList.map((category) => (
                         <div
@@ -276,7 +284,7 @@ const CustomizeCategory = () => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
 
         </div>
     )
