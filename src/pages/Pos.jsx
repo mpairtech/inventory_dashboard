@@ -311,7 +311,7 @@ const Pos = () => {
 
       // data.append("sale_id", Math.random().toString(36).substr(2, 9));
       data.append("store_id", "motherStoreId001");
-      // data.append("store_name", storeInfo.name);
+      data.append("org_id", userInfo?.organizationData?.org_id);
       data.append("c_id", "C111111")
       data.append("c_name", customerName);
       data.append("c_number", customerMobile);

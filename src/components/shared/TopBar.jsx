@@ -4,18 +4,20 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const TopBar = () => {
   const { userInfo } = useAuth();
+  console.log(userInfo)
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg py-0 bg-white noprint border-bottom shadow-sm">
         <div className="container-fluid p-0 max_width">
           <Link to="/" className="nav-start d-flex align-items-center logoitem">
             <img
-              src="/demo-logo.png"
+              src={`${import.meta.env.VITE_IMG}${userInfo?.organizationData?.logo}`}
               alt=""
               className="logo_icon mx-2 my-2 text-center nav-img"
             />

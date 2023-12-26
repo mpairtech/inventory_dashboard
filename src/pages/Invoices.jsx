@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import DataTable, { createTheme } from "react-data-table-component";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { UserInfoContext } from "../providers/AuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 
 createTheme({
   background: {
@@ -25,7 +25,7 @@ const Invoices = () => {
   const columns = [
     {
       name: "Date",
-      selector: (row) => row.date.split("T")[0],
+      selector: (row) => row.createdAt,
       sortable: true,
       minWidth: false,
       center: true,
@@ -42,13 +42,13 @@ const Invoices = () => {
 
     {
       name: "Quantity",
-      selector: (row) => row.p_qty,
+      selector: (row) => row?.sale_items?.map((item) => +item.quantity).reduce((a, b) => a + b, 0),
       sortable: true,
       width: "15%",
     },
     {
       name: "Price",
-      selector: (row) => row.total_amount + " BDT",
+      selector: (row) => row?.sale_items?.map((item) => +item.total_price).reduce((a, b) => a + b, 0) + " BDT",
       sortable: true,
       width: "30%",
     },
@@ -173,8 +173,9 @@ const Invoices = () => {
       ),
     },
   ];
-  const { userInfo, storeInfo } = useContext(UserInfoContext);
-  // console.log(userInfo, storeInfo);
+
+  const { userInfo } = useAuth();
+  console.log(userInfo);
   const [storeList, setStoreList] = useState([]);
   const [store, setStore] = useState(null);
   const [update, setUpdate] = useState(0);
@@ -197,22 +198,18 @@ const Invoices = () => {
       .catch((err) => console.log(err));
   };
 
-  const getAllSalesInfoItemByStoreId = () => {
+  const getAllSalesInfoItemForOrg = () => {
     const data = new FormData();
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getAllSalesInfoItem`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/sale/getAllInvoiceForOrg`, {
       method: "POST",
+      body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res.message);
-        if (selectedDate) {
-          const filteredData = res.message.filter((item) => {
-            const itemDate = new Date(item.date).toISOString().slice(0, 10); // Extract date in "YYYY-MM-DD" format
-            return itemDate === selectedDate && item.store_id === store;
-          });
-          setAllInvoiceInfoItem(filteredData);
-        } else {
-          setAllInvoiceInfoItem(res.message);
+        console.log(res);
+        if (res.success === true) {
+          setAllInvoiceInfoItem(res.invoices);
         }
       })
       .catch((err) => console.log(err));
@@ -225,15 +222,15 @@ const Invoices = () => {
     console.log(id);
     const data = new FormData();
     data.append("sale_id", id);
-
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getInvoiceForStore`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/sale/getInvoiceById`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        setSelectedInvoice(res);
+        setSelectedInvoice(res.invoice);
       })
       .catch((err) => console.log(err));
   };
@@ -263,7 +260,7 @@ const Invoices = () => {
 
 
   useEffect(() => {
-    getAllSalesInfoItemByStoreId();
+    getAllSalesInfoItemForOrg();
   }, [update, selectedDate, store]);
 
   useEffect(() => {
@@ -344,12 +341,13 @@ const Invoices = () => {
                       className="px-0"
                       columns={columns}
                       //filterout duplicate sale_id  
-                      data={allInvoiceInfoItem && allInvoiceInfoItem.filter((item, index, self) =>
-                        index === self.findIndex((t) => (
-                          t.sale_id === item.sale_id
-                        ))
-                      )
-                      }
+                      // data={allInvoiceInfoItem && allInvoiceInfoItem.filter((item, index, self) =>
+                      //   index === self.findIndex((t) => (
+                      //     t.sale_id === item.sale_id
+                      //   ))
+                      // )
+                      // }
+                      data={allInvoiceInfoItem}
                       dense
                       pagination
                       paginationPerPage={6}
@@ -371,7 +369,7 @@ const Invoices = () => {
                               <div className="row mt-2">
                                 <div className="col-lg-12">
                                   <span className="fs-5 pt-2 fw-600 mb-0">Invoice Details</span>
-                                  <p className="font-12 mb-2">Invoice Details ({selectedInvoice.info[0].sale_id})</p>
+                                  <p className="font-12 mb-2">Invoice Details ({selectedInvoice.sale_id})</p>
                                 </div>
                               </div>
                             </div>
@@ -411,29 +409,29 @@ const Invoices = () => {
                                   </tr>
                                 </thead>
                                 <tbody className="border-0">
-                                  {selectedInvoice?.item?.map((item, index) => (
-                                    <tr key={item.id} className="border-bottom">
+                                  {selectedInvoice?.sale_items?.map((item, index) => (
+                                    <tr key={item.sale_item_id} className="border-bottom">
                                       <td width="55%" className="border-0 font-12 text-superdark">
-                                        {item.p_name} <br />
+                                        {item.product_id} <br />
                                         {item.p_var}
                                       </td>
                                       <td
                                         width="15%"
                                         className="border-0 font-12 ps-3 text-superdark "
                                       >
-                                        {item.p_size}
+                                        {item.product_id}
                                       </td>
 
                                       <td
                                         width="10%"
                                         className="border-0 font-12 ps-4 text-superdark"
                                       >
-                                        {item.p_qty}
+                                        {item.quantity}
                                       </td>
 
                                       <td width="20%" className="border-0 font-12 text-superdark">
                                         <p className="mb-0 px-0 font-weight-600 text-nowrap text-end ">
-                                          {item.p_price.toFixed(2)} BDT
+                                          {item.price} BDT
                                         </p>
                                       </td>
                                     </tr>
@@ -451,7 +449,7 @@ const Invoices = () => {
 
                                     <td className="border-0 font-14">
                                       <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                                        {(selectedInvoice?.info[0]?.subtotal).toFixed(2)} BDT
+                                        {(selectedInvoice?.total_payable)} BDT
                                       </p>
                                     </td>
                                   </tr>
@@ -467,7 +465,7 @@ const Invoices = () => {
 
                                     <td className="border-0 font-14">
                                       <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                                        {(selectedInvoice?.info[0]?.d_amount).toFixed(2)} BDT
+                                        {(selectedInvoice?.discount)} BDT
                                       </p>
                                     </td>
                                   </tr>
@@ -484,7 +482,7 @@ const Invoices = () => {
                                     <td className="border-0 font-14 fw-semibold">
 
                                       <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                                        {(selectedInvoice?.info[0]?.total_amount).toFixed(2)} BDT
+                                        {(selectedInvoice?.total_payable)} BDT
                                       </p>
                                     </td>
                                   </tr>
@@ -527,7 +525,7 @@ const Invoices = () => {
       </div>
 
       {/* printable div */}
-      {invoice?.info && invoice?.item && (
+      { invoice && (
         <div
           style={{
             width: "275px",
@@ -545,19 +543,19 @@ const Invoices = () => {
             Nowbab
           </p>
           <p className="font-14 text-center mt-1 ms-2">
-            <i class="fa-solid fa-location-dot"></i> {storeInfo.location}
+            <i class="fa-solid fa-location-dot"></i> {userInfo?.organizationData?.location}
           </p>
           <p className="font-14 text-center my-1 ms-2">
-            {storeInfo.phone}
+            {userInfo?.organizationData?.number}
           </p>
           <p className="font-14 text-center my-2 ms-2">
-            #{invoice?.info[0]?.sale_id}
+            #{invoice?.sale_id}
           </p>
           <p className="font-12 text-start">
-            Customer Name: {invoice?.info[0]?.customer_name}
+            Customer Name: {invoice?.c_name}
           </p>
           <p className="font-12 text-start">
-            Mobile Number: {invoice?.info[0]?.customer_phone}
+            Mobile Number: {invoice?.c_number}
           </p>
 
           <table className="table mt-2 ">
@@ -595,11 +593,11 @@ const Invoices = () => {
               </tr>
             </thead>
             <tbody className="border-0">
-              {invoice?.item?.map((item, index) => (
-                <tr key={item.id} className="border-bottom">
+              {invoice?.sale_items?.map((item, index) => (
+                <tr key={item.sale_item_id} className="border-bottom">
                   <td width="55%" className="border-0 font-12 text-superdark">
-                    {item.p_name} <br />
-                    {item.p_var}
+                    {item.product_id} <br />
+                    {item.product_id}
                   </td>
                   <td
                     width="15%"
@@ -612,12 +610,12 @@ const Invoices = () => {
                     width="10%"
                     className="border-0 font-12 ps-4 text-superdark"
                   >
-                    {item.p_qty}
+                    {item.quantity}
                   </td>
 
                   <td width="20%" className="border-0 font-12 text-superdark">
                     <p className="mb-0 px-0 font-weight-600 text-nowrap ">
-                      {item.p_price.toFixed(2)} BDT
+                      {item.price} BDT
                     </p>
                   </td>
                 </tr>
@@ -636,7 +634,7 @@ const Invoices = () => {
 
                 <td className="border-0 font-14">
                   <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                    {(invoice?.info[0]?.subtotal).toFixed(2)} BDT
+                    {(invoice?.total_paid)} BDT
                   </p>
                 </td>
               </tr>
@@ -654,7 +652,7 @@ const Invoices = () => {
 
                 <td className="border-0 font-14">
                   <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                    {(invoice?.info[0]?.d_amount).toFixed(2)} BDT
+                    {(invoice?.discount)} BDT
                   </p>
                 </td>
               </tr>
@@ -672,7 +670,7 @@ const Invoices = () => {
 
                 <td className="border-0 font-14 fw-semibold">
                   <p className="mb-0 px-0 font-weight-600 text-nowrap text-end text-superdark">
-                    {(invoice?.info[0]?.total_amount).toFixed(2)} BDT
+                    {(invoice?.total_paid)} BDT
                   </p>
                 </td>
               </tr>

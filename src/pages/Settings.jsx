@@ -8,6 +8,7 @@ import CustomizeUnit from "./settings/CustomizeUnit";
 import CustomizeAttribute from "./settings/CustomizeAttribute";
 import CustomizeUser from "./settings/CustomizeUser";
 import CustomizeOrg from "./settings/CustomizeOrg";
+import CustomizeEmployee from "./settings/CustomizeEmployee";
 
 
 const Settings = () => {
@@ -107,6 +108,10 @@ const Settings = () => {
                 {
                   activeTab === "User" &&
                   <CustomizeUser />
+                }
+                {
+                  activeTab === "Employee" &&
+                  <CustomizeEmployee />
                 }
                 {
                   activeTab === "Category" &&

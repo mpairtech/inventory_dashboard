@@ -16,6 +16,7 @@ const Setup = () => {
     const [orgEmail, setOrgEmail] = useState("");
     const [type, setType] = useState("");
     const [isMulti, setIsMulti] = useState("");
+    const [cat_length, setCat_length] = useState(0);
     const [orgLocation, setOrgLocation] = useState("");
     const [img, setImg] = useState("");
 
@@ -30,6 +31,7 @@ const Setup = () => {
         data.append("user_id", userInfo.user_id);
         data.append("type", type);
         data.append("isMulti", isMulti);
+        data.append("category_length", cat_length);
         data.append("location", orgLocation);
         fetch(`${import.meta.env.VITE_SERVER}/authority/createOrganization`, {
             method: "POST",
@@ -124,6 +126,27 @@ const Setup = () => {
                         </div>
                         <div className="my-3 col-lg-3">
                             <label
+                                htmlFor="message-text"
+                                className="col-form-label text-muted fw-500"
+                            >
+                                Category Length
+                            </label>
+                            <select
+                                className="form-control py-2 font-13 shadow-none"
+                                onChange={(e) => setCat_length(e.target.value)}
+                            >
+                                <option selected disabled value="">
+                                    Select Length
+                                </option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div className="my-3 col-lg-3">
+                            <label
                                 htmlFor="recipient-name"
                                 className="col-form-label text-muted fw-500"
                             >
@@ -162,7 +185,7 @@ const Setup = () => {
                             />
                         </div>
 
-                        <div className="my-3 col-lg-3">
+                        <div className="my-3 col-lg-12">
                             <label
                                 htmlFor="recipient-name"
                                 className="col-form-label text-muted fw-500"
@@ -171,7 +194,7 @@ const Setup = () => {
                             </label>
                             <input
                                 type="text"
-                                className="form-control py-2 font-13 shadow-none bg-white"
+                                className="form-control py-4 font-13 shadow-none bg-white"
                                 onChange={(e) => setOrgLocation(e.target.value)}
                             />
                         </div>
