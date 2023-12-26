@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import {  useAuth } from "../../providers/AuthProvider";
+import { useAuth } from "../../providers/AuthProvider";
 
 const Navbar = () => {
 
   const { userInfo } = useAuth();
-
+  console.log(userInfo)
   return (
     <div className="container-fluid pos-primary noprint">
       <div className="row">
@@ -31,18 +31,23 @@ const Navbar = () => {
             </NavLink>
 
 
-            <NavLink
-              to="/store"
-              className={({ isActive }) =>
-                `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
-                }`
-              }
-            >
-              <div className="d-flex align-items-center">
-                <img src="/shop.png" className="nav-img-icon me-2" />
-                <p className="mb-0 me-2 ms-1">Store</p>
-              </div>
-            </NavLink>
+            {
+              userInfo.organizationData?.isMulti === "YES" &&
+              (
+                <NavLink
+                  to="/store"
+                  className={({ isActive }) =>
+                    `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
+                    }`
+                  }
+                >
+                  <div className="d-flex align-items-center">
+                    <img src="/shop.png" className="nav-img-icon me-2" />
+                    <p className="mb-0 me-2 ms-1">Store</p>
+                  </div>
+                </NavLink>
+              )
+            }
 
 
             <NavLink
@@ -72,20 +77,22 @@ const Navbar = () => {
               </div>
             </NavLink>
 
-
-            <NavLink
-              to="/transfer"
-              className={({ isActive }) =>
-                `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
-                }`
-              }
-            >
-              <div className="d-flex align-items-center">
-                <img src="/share.png" className="nav-img-icon me-2" />
-                <p className="mb-0 me-2 ms-1">Transfer</p>
-              </div>
-            </NavLink>
-
+            {
+              userInfo.organizationData?.isMulti === "YES" &&
+              (
+                <NavLink
+                  to="/transfer"
+                  className={({ isActive }) =>
+                    `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
+                    }`
+                  }
+                >
+                  <div className="d-flex align-items-center">
+                    <img src="/share.png" className="nav-img-icon me-2" />
+                    <p className="mb-0 me-2 ms-1">Transfer</p>
+                  </div>
+                </NavLink>
+              )}
 
             <NavLink
               to="/expenses"

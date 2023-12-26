@@ -7,7 +7,7 @@ const CustomizeCategory = () => {
     const navigate = useNavigate();
 
     const { userInfo } = useAuth();
-
+    console.log(userInfo)
     const [update, setUpdate] = useState(false);
 
 
@@ -18,13 +18,19 @@ const CustomizeCategory = () => {
     console.log(allMainCategories)
     const [parentCategory, setParentCategory] = useState(null)
     console.log(parentCategory);
+    
 
     const addCategory = (e) => {
         e.preventDefault();
+        if(userInfo?.organizationData?.category_length <= parentCategory?.depth){
+            toast.error("Category Depth Exceeded");
+            return;
+        }
+
         const data = new FormData();
         data.append("img", img);
         data.append("name", name);
-        if (parentCategory) data.append("parent_id", parentCategory);
+        if (parentCategory) data.append("parent_id", parentCategory.category_id);
         data.append("org_id", userInfo?.organizationData?.org_id);
         data.append("user_id", userInfo?.user_id);
 
@@ -61,7 +67,6 @@ const CustomizeCategory = () => {
     };
 
 
-
     useEffect(() => {
         getAllCategories();
     }, [update]);
@@ -87,7 +92,9 @@ const CustomizeCategory = () => {
     const renderNestedCategories = (categories, depth = 1) => {
         return categories.map((category) => (
             <>
-                <option key={category.category_id} value={category.category_id}>
+                <option key={category.category_id} value={JSON.stringify(category)}
+
+                >
                     {'━'.repeat(depth)} {category.name}
                 </option>
                 {category.subcategories && category.subcategories.length > 0 &&
@@ -158,9 +165,10 @@ const CustomizeCategory = () => {
                                     </label>
                                     <select 
                                     onChange={
-                                        (e) => setParentCategory(e.target.value)
+                                        (e) => setParentCategory(JSON.parse(e.target.value))
                                     }
                                     className='form-control shadow-none '>
+                                        <option value={null}>Select parent category</option>
                                         {renderNestedCategories(allMainCategories)}
                                     </select>
                                 </div>
