@@ -9,6 +9,8 @@ export const AuthProvider = (props) => {
   const [userInfo, setUserInfo] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [authUpdate, setAuthUpdate] = useState(false);
+
   console.log(userInfo, "==>AUTH");
 
   let token = JSON.parse(localStorage.getItem("token"));
@@ -44,7 +46,7 @@ export const AuthProvider = (props) => {
   };
   useEffect(() => {
     getUserData();
-  }, []);
+  }, [authUpdate]);
 
 
   return (
@@ -54,6 +56,8 @@ export const AuthProvider = (props) => {
           userInfo,
           loading,
           setLoading,
+          authUpdate,
+          setAuthUpdate,
         }}
       >
         {props.children}

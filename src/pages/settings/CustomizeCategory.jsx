@@ -11,14 +11,15 @@ const CustomizeCategory = () => {
     const [update, setUpdate] = useState(false);
 
 
-    const [img, setImg] = useState("");
+    const [img, setImg] = useState(null);
     const [name, setName] = useState("");
 
     const [allMainCategories, setAllMainCategories] = useState([]);
     console.log(allMainCategories)
     const [parentCategory, setParentCategory] = useState(null)
     console.log(parentCategory);
-    
+
+    console.log(img?.name)
 
     const addCategory = (e) => {
         e.preventDefault();

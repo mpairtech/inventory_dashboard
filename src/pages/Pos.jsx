@@ -145,8 +145,8 @@ const Pos = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-          console.log(res)
-          setAllCustomers(res);
+        console.log(res)
+        setAllCustomers(res);
       })
       .catch((err) => console.log(err));
   };
@@ -453,8 +453,8 @@ const Pos = () => {
   const [activeDiv, setActiveDiv] = useState("cart");
 
 
-  const [categories, setCategories] = useState([]);
-
+  const [allMainCategories, setAllMainCategories] = useState([]);
+  console.log(allMainCategories)
   const [data, setData] = useState([]);
 
   console.log(data);
@@ -462,15 +462,16 @@ const Pos = () => {
 
   const getAllCategories = () => {
     const data = new FormData();
-    data.append("store_id", 5);
-    fetch(`${import.meta.env.VITE_SERVER}/getAllCategory`, {
+    data.append("org_id", userInfo?.organizationData?.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/product/getAllCategoriesForOrg`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
-        setCategories(res.message);
+        setAllMainCategories(
+          res.filter((category) => category.parent_id === null)
+        );
       })
       .catch((err) => console.log(err));
   };
@@ -643,10 +644,10 @@ const Pos = () => {
                       className="mySwiper py-3"
                     >
                       {
-                        categories.map((item, index) => (
+                        allMainCategories.map((item, index) => (
                           <SwiperSlide key={item.id} className="p-1 rounded-3">
                             <div
-                              key={item.id} className={`rounded-3 border-0 text-center p-3 cursor-pointer hover_effect2 ${activeCategory == item.id ? 'active-category-box' : ''}`}
+                              key={item.category_id} className={`rounded-3 border-0 text-center p-3 cursor-pointer hover_effect2 ${activeCategory == item.id ? 'active-category-box' : ''}`}
                               onClick={() => setActiveCategory(item.id)}
                             >
                               <img
@@ -656,7 +657,7 @@ const Pos = () => {
                                 height={40}
                                 width={40}
                                 alt="" />
-                              <p className='font-14 mx-auto mt-1 fw-semibold'> {item.category_name}</p>
+                              <p className='font-14 mx-auto mt-1 fw-semibold'> {item.name}</p>
                             </div>
                           </SwiperSlide>
                         ))

@@ -15,11 +15,9 @@ const AddProduct = () => {
   const [productId, setProductId] = useState("");
 
   const [productName, setProductName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  console.log(selectedCategory, "setSelectedCategory");
 
-  const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  console.log(selectedSubCategory, "selectedSubCategory");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  console.log(selectedCategory, "selectetCategory");
 
   const [attributes, setAttributes] = useState([]);
 
@@ -35,10 +33,7 @@ const AddProduct = () => {
   const [images, setImages] = useState([null, null, null, null]);
 
 
-
-
-  const [categoryList, setCategoryList] = useState([]);
-  const [subCategoryList, setSubCategoryList] = useState([]);
+  const [mainCategoryList, setMainCategoryList] = useState([]);
 
   const getLastProductId = () => {
     const date = new Date();
@@ -62,33 +57,17 @@ const AddProduct = () => {
   const getAllCategories = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
-    fetch(`${import.meta.env.VITE_SERVER}/product/getAllMainCategoriesForOrg`, {
+    data.append("parent_id", selectedCategory);
+    fetch(`${import.meta.env.VITE_SERVER}/product/getAllCategoriesForOrg`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log("main categories==> ", res);
-        setCategoryList(
+        console.log(res);
+        setMainCategoryList(
           res.filter((category) => category.parent_id === null)
         );
-      })
-      .catch((err) => console.log(err));
-  };
-
-
-  const getAllSubCategories = () => {
-    const data = new FormData();
-    data.append("org_id", userInfo?.organizationData?.org_id);
-    data.append("parent_id", selectedCategory);
-    fetch(`${import.meta.env.VITE_SERVER}/product/getAllSubcategoriesForOrg`, {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log("sub categories==> ", res);
-        setSubCategoryList(res);
       })
       .catch((err) => console.log(err));
   };
@@ -191,9 +170,9 @@ const AddProduct = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     console.log(itemsArray, "itemsArray");
-    const categoryIdsArray = [];
-    categoryIdsArray.push(selectedCategory);
-    categoryIdsArray.push(selectedSubCategory);
+    // const categoryIdsArray = [];
+    // categoryIdsArray.push(selectedCategory);
+    // categoryIdsArray.push(selectedSubCategory);
 
     const data = new FormData();
     data.append("product_id", productId);
@@ -202,11 +181,11 @@ const AddProduct = () => {
     // data.append("qty", +itemsArray[0]?.quantity);
     data.append("des", description);
     data.append("org_id", userInfo?.organizationData?.org_id);
-    data.append("categoryId", selectedSubCategory);
+    data.append("categoryId", selectedCategory.category_id);
     data.append("user_id", userInfo?.user_id);
-    data.append("categoryIds",  JSON.stringify(categoryIdsArray));
+    // data.append("categoryIds", JSON.stringify(categoryIdsArray));
     data.append("itemsArray", JSON.stringify(itemsArray));
-
+    data.append("specifications", JSON.stringify(inputFields));
     // console log all the data
     for (var pair of data.entries()) {
       console.log(pair[0] + ", " + pair[1]);
@@ -237,9 +216,41 @@ const AddProduct = () => {
   }, []);
 
   useEffect(() => {
-    getAllSubCategories();
-  }, [selectedCategory, selectedSubCategory]);
+    getAllCategories();
+  }, [selectedCategory]);
 
+
+  // specification
+
+  const [inputFields, setInputFields] = useState([{ key: '', value: '' }]);
+  console.log(inputFields, "inputFields")
+  const handleInputChange = (index, event) => {
+    const values = [...inputFields];
+    if (event.target.name === "key") {
+      values[index].key = event.target.value;
+    } else {
+      values[index].value = event.target.value;
+    }
+    setInputFields(values);
+  };
+
+  const handleAddFields = () => {
+    setInputFields([...inputFields, { key: '', value: '' }]);
+  };
+
+  const renderNestedCategories = (categories, depth = 1) => {
+    return categories.map((category) => (
+        <>
+            <option key={category.category_id} value={JSON.stringify(category)}
+
+            >
+                {'━'.repeat(depth)} {category.name}
+            </option>
+            {category.subcategories && category.subcategories.length > 0 &&
+                renderNestedCategories(category.subcategories, depth + 1)}
+        </>
+    ))
+};
 
   return (
     <div className="container-fluid overflow-x-hidden bg-white min-vh-84">
@@ -287,7 +298,7 @@ const AddProduct = () => {
 
 
 
-                          <div className="col-lg-6 py-2 ">
+                          {/* <div className="col-lg-6 py-2 ">
                             <div className="mb-1 text-muted">
                               <label className="form-label addempfont">
                                 Main Category
@@ -315,70 +326,23 @@ const AddProduct = () => {
                                 })}
                               </select>
                             </div>
-                          </div>
+                          </div> */}
 
                           <div className="col-lg-6 py-2 ">
                             <div className="mb-1 text-muted">
                               <label className="form-label addempfont">
-                                Sub Category
+                                Select Category
                               </label>
-                              <select
-                                className="form-control py-2 font-13 shadow-none"
-                                onChange={(e) =>
-                                  setSelectedSubCategory(e.target.value)
-                                }
-                                placeholder="Choose category"
-                                id="cars"
-                              >
-                                <option selected disabled value="">
-                                  Choose Category
-                                </option>
-                                {subCategoryList.map((item) => {
-                                  return (
-                                    <option
-                                      key={item.category_id}
-                                      value={item.category_id}
-                                    >
-                                      {item.name}
-                                    </option>
-                                  );
-                                })}
-                              </select>
+                              <select 
+                                    onChange={
+                                        (e) => setSelectedCategory(JSON.parse(e.target.value))
+                                    }
+                                    className='form-control shadow-none '>
+                                        <option value={null}>Select category</option>
+                                        {renderNestedCategories(mainCategoryList)}
+                                    </select>
                             </div>
                           </div>
-
-                          {subCategoryList.length > 0 && (
-                            <div className="col-lg-6 py-2 ">
-                              <div className="mb-1 text-muted">
-                                <label className="form-label addempfont">
-                                  Sub Sub Category
-                                </label>
-                                <select
-                                  className="form-control py-2 font-13 shadow-none"
-                                  onChange={(e) =>
-                                    setSelectedSubCategory(e.target.value)
-                                  }
-                                  placeholder="Choose category"
-                                  id="cars"
-                                >
-                                  <option selected disabled value="">
-                                    Choose Category
-                                  </option>
-                                  {subCategoryList.map((item) => {
-                                    console.log(item, "item")
-                                    return (
-                                      <option
-                                        key={item?.subcategories[0].category_id}
-                                        value={item?.subcategories[0].category_id}
-                                      >
-                                        {item?.subcategories[0].name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </div>
-                            </div>
-                          )}
 
                           <div className="col-lg-6 py-2 ">
                             <div className="mb-1 text-muted">
@@ -564,6 +528,7 @@ const AddProduct = () => {
                 </div>
               </>
             )}
+
             {itemsArray?.map((item, index) => {
               return (
                 <>
@@ -595,6 +560,34 @@ const AddProduct = () => {
                 </>
               );
             })}
+          </div>
+
+          <div className="mb-3 rounded-2 ">
+            <h6 className="pb-3 text-muted mid_font border-bottom font-14">
+              Product Specification
+            </h6>
+            <div className="d-flex flex-column gap-3 mt-3">
+              {inputFields.map((inputField, index) => (
+                <div className="d-flex gap-3" key={`${inputField}-${index}`}>
+                  <input
+                    name="key"
+                    value={inputField.key}
+                    onChange={event => handleInputChange(index, event)}
+                    className="form-control py-2 font-13 shadow-none"
+                  />
+                  <input
+                    name="value"
+                    value={inputField.value}
+                    onChange={event => handleInputChange(index, event)}
+                    className="form-control py-2 font-13 shadow-none"
+                  />
+                </div>
+              ))}
+              <button
+                onClick={handleAddFields}
+                className="btn_small"
+              >+</button>
+            </div>
           </div>
 
           <div className="col-lg-12 mt-5">
