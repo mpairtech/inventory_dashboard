@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import TopBar from "../components/shared/TopBar";
 import Navbar from "../components/shared/Navbar";
 import { useAuth } from "../providers/AuthProvider";
@@ -7,6 +7,9 @@ import { useAuth } from "../providers/AuthProvider";
 const MainLayout = () => {
 
     const { loading } = useAuth();
+
+    const location = useLocation()
+    console.log(location.pathname)
 
     if (loading) {
 
@@ -26,10 +29,14 @@ const MainLayout = () => {
 
     return (
         <div>
-            <div className="sticky-top">
-                <TopBar />
-                <Navbar />
-            </div>
+            {
+                location.pathname !== "/pos" &&
+                <div className="sticky-top">
+                    <TopBar />
+                    <Navbar />
+                </div>
+            }
+
             <Outlet />
         </div>
     );

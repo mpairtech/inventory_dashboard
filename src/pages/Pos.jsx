@@ -187,7 +187,7 @@ const Pos = () => {
       setRefTotal(parseFloat(myRef.current.innerText));
       setUltDiscountAmount(total - (total - total * (dis / 100)));
     }
-  }, [dis, fixedDiscount, updateCount, items]);
+  }, [dis, fixedDiscount, updateCount, items , cardAmount, cashAmount, otherAmount]);
 
 
   useEffect(() => {
@@ -282,10 +282,11 @@ const Pos = () => {
     }
   });
 
+  console.log(refTotal)
+  console.log(+cashAmount + +cardAmount + +otherAmount)
 
   function handleSubmitSale() {
     if (refTotal !== +cashAmount + +cardAmount + +otherAmount) {
-      console.log(refTotal, +cashAmount + +cardAmount + +otherAmount)
       toast.error("Please check amount!");
       return;
     } else {
@@ -334,6 +335,7 @@ const Pos = () => {
       })
         .then((res) => res.json())
         .then((res) => {
+          console.log(res)
           if (res.success) {
             setInvoiceLoading(false);
             items?.map((item) => {
@@ -463,6 +465,8 @@ const Pos = () => {
 
 
   const getStoreProducts = () => {
+    console.log(activeCategory)
+    console.log(searchedProducts)
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
     data.append("category_id", activeCategory);
@@ -472,7 +476,12 @@ const Pos = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        setData(res);
+        console.log(res)
+        if(activeCategory === 0){
+          setData(searchedProducts)
+        } else {
+          setData(res)
+        }
       })
       .catch((err) => console.log(err));
   };
@@ -483,7 +492,7 @@ const Pos = () => {
 
   useEffect(() => {
     getStoreProducts();
-  }, [activeCategory]);
+  }, [activeCategory, searchedProducts]);
 
   const navigate = useNavigate();
   return (
@@ -503,7 +512,7 @@ const Pos = () => {
                           <div className="me-3 py-2">
                             {" "}
                             <img
-                              src={`${import.meta.env.VITE_IMG}${item.img}`}
+                              src={`${import.meta.env.VITE_IMG}${item.imageSrc1}`}
                               className="card-offcanvas-img rounded border border-secondery"
                               alt=""
                               width={70}
@@ -513,12 +522,13 @@ const Pos = () => {
                           <div className="w-50">
                             {" "}
                             <p className="font-14 fw-semibold mb-1">
-                              {item.name} <span className="text-info">({(item.attributeIds)
+                              {item.name} 
+                              {/* <span className="text-info">({(item.attributeIds)
                                 .map((item) => {
                                   return item;
                                 })
                                 .join(", ")
-                              })</span>
+                              })</span> */}
                             </p>
                             <p className="font-12 mb-1">
                               {item.id}
@@ -860,7 +870,14 @@ const Pos = () => {
                       </div>
                       <div className="w-50 m-0">
                         <button
-                          onClick={() => setActiveDiv(activeDiv === "cart" ? "pos" : "cart")}
+                          onClick={() => 
+
+                            {
+                              items.length === 0 ? toast.error("Please add some items !") :
+                              setActiveDiv(activeDiv === "cart" ? "pos" : "cart")
+                            }
+                          
+                          }
                           className="btn_primary border-0 text-white font-16 rounded-1 w-100"
                         >
                           Go to Checkout

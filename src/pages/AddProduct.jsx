@@ -231,6 +231,12 @@ const AddProduct = () => {
     setInputFields([...inputFields, { key: '', value: '' }]);
   };
 
+  const handleRemoveFields = (index) => {
+    const values = [...inputFields];
+    values.splice(index, 1);
+    setInputFields(values);
+  };
+
   const renderNestedCategories = (categories, depth = 1) => {
     return categories.map((category) => (
         <>
@@ -446,10 +452,10 @@ const AddProduct = () => {
             Stock Variation
           </h6>
 
-          <form id="variantForm" onSubmit={addVariant} className="row py-2">
+          <form id="variantForm" onSubmit={addVariant} className="row">
             {attributeList.length > 0 && (
               attributeList.map((attribute) => (
-                <div className="col-lg-2 py-2" key={attribute.attribute_id}>
+                <div className="col-lg-3 py-2" key={attribute.attribute_id}>
                   <div className="mb-1 text-muted">
                     <label className="form-label addempfont">{attribute.name}</label>
                     <select
@@ -479,7 +485,7 @@ const AddProduct = () => {
               ))
             )}
 
-            <div className="col-lg-2 py-2">
+            <div className="col-lg-3 py-2">
               <div className="mb-1 text-muted">
                 <label className="form-label addempfont">Quantity</label>
                 <input
@@ -492,7 +498,7 @@ const AddProduct = () => {
               </div>
             </div>
 
-            <div className="col-lg-2 py-2 mt-2">
+            <div className="col-lg-3 py-2 mt-2">
               <button
                 type="submit"
                 className="btn_active3 w-100 mt-4"
@@ -565,7 +571,11 @@ const AddProduct = () => {
             <h6 className="pb-3 text-muted mid_font border-bottom font-14">
               Product Specification
             </h6>
-            <div className="d-flex flex-column gap-3 mt-3">
+            <div className="d-flex flex-column gap-3 mt-3  ">
+            <div className="d-flex gap-3">
+                <label className="form-label addempfont w-50">Name</label>
+                <label className="form-label addempfont w-50">Value</label>
+            </div>
               {inputFields.map((inputField, index) => (
                 <div className="d-flex gap-3" key={`${inputField}-${index}`}>
                   <input
@@ -582,10 +592,16 @@ const AddProduct = () => {
                   />
                 </div>
               ))}
-              <button
+            <div className="text-end">
+            <button
                 onClick={handleAddFields}
-                className="btn_small"
+                className="btn_blue w-25 me-3"
               >+</button>
+            <button
+                onClick={handleRemoveFields}
+                className="btn_danger w-25"
+              >-</button>
+            </div>
             </div>
           </div>
 
@@ -594,7 +610,7 @@ const AddProduct = () => {
               <button
                 onClick={handleAddProduct}
                 type="submit"
-                className="btn_primary px-5"
+                className="btn_primary px-5 w-100 "
               >
                 {load ? (
                   <div
