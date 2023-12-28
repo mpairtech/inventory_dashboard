@@ -230,12 +230,11 @@ const Pos = () => {
     getSearchedProduct();
   }, [searchText]);
 
-  function addToLocalCart(p_id, name, images, quantity, price, total_quantity, attributeIds, des) {
-    console.log(p_id, name, images, quantity, price, total_quantity, attributeIds, des)
+  function addToLocalCart(p_id, name, imageSrc1, quantity, price, total_quantity, attributeIds, des) {
     var productItem = {
       p_id: p_id,
       name: name,
-      images: images,
+      imageSrc1: imageSrc1,
       quantity: quantity,
       price: price,
       total_quantity: total_quantity,
@@ -480,21 +479,15 @@ const Pos = () => {
   const getStoreProducts = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
-    fetch(`${import.meta.env.VITE_SERVER}/product/getAllProductsForOrg`, {
+    data.append("category_id", activeCategory);
+    fetch(`${import.meta.env.VITE_SERVER}/product/getProductsByCategory`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        if (activeCategory == 0) {
-          setData(res)
-        } else {
-          const storeData = res.filter((item) => {
-            return item.category_id == activeCategory;
-          });
-          setData(storeData);
-        }
+        setData(res);
       })
       .catch((err) => console.log(err));
   };
@@ -647,13 +640,13 @@ const Pos = () => {
                         allMainCategories.map((item, index) => (
                           <SwiperSlide key={item.id} className="p-1 rounded-3">
                             <div
-                              key={item.category_id} className={`rounded-3 border-0 text-center p-3 cursor-pointer hover_effect2 ${activeCategory == item.id ? 'active-category-box' : ''}`}
-                              onClick={() => setActiveCategory(item.id)}
+                              key={item.category_id} className={`rounded-3 border-0 text-center p-3 cursor-pointer hover_effect2 ${activeCategory == item.category_id ? 'active-category-box' : ''}`}
+                              onClick={() => setActiveCategory(item.category_id)}
                             >
                               <img
 
                                 className='m-1'
-                                src={`${import.meta.env.VITE_IMG}${item.imgSrc}`}
+                                src={`${import.meta.env.VITE_IMG}${item.image}`}
                                 height={40}
                                 width={40}
                                 alt="" />
@@ -678,7 +671,7 @@ const Pos = () => {
                               addToLocalCart(
                                 item.product_id,
                                 item.name,
-                                item.images,
+                                item.imageSrc1,
                                 1,
                                 item.price,
                                 item.qty,
@@ -690,13 +683,13 @@ const Pos = () => {
                             <div className='p-2 bg-white shadow-sm border-0 rounded-3 card-hover d-flex mb-3'>
                               <img
                                 className='pos-product-img me-2'
-                                src={`${import.meta.env.VITE_IMG}${item.imgSrc_1}`}
+                                src={`${import.meta.env.VITE_IMG}${item.imageSrc1}`}
                                 height={70}
                                 width={70}
                                 alt="" />
                               <div>
-                                <p className='font-14 m-0 fw-semibold'> {item.pname} {item.attributeIds}</p>
-                                <p className='font-12 m-0 pos-card-price'> {item.price} $</p>
+                                <p className='font-14 m-0 fw-semibold'> {item?.name} {item?.attributeIds}</p>
+                                <p className='font-12 m-0 pos-card-price'> {item?.price} $</p>
                               </div>
                             </div>
 
@@ -762,7 +755,7 @@ const Pos = () => {
                                 addToLocalCart(
                                   item.product_id,
                                   item.name,
-                                  item.images,
+                                  item.imageSrc1,
                                   1,
                                   item.price,
                                   item.qty,
@@ -805,7 +798,7 @@ const Pos = () => {
                                   <div className="me-3 py-2">
                                     {" "}
                                     <img
-                                      src={`${import.meta.env.VITE_IMG}${item.img}`}
+                                      src={`${import.meta.env.VITE_IMG}${item.imageSrc1}`}
                                       className="card-offcanvas-img rounded border border-secondery"
                                       alt=""
                                       width={70}
@@ -816,12 +809,13 @@ const Pos = () => {
                                   <div className="w-50">
                                     {" "}
                                     <p className="font-14 fw-semibold mb-1">
-                                      {item.name} <span className="text-info">({(item.attributeIds)
+                                      {item.name} 
+                                      {/* <span className="text-info">({(item.attributeIds)
                                         .map((item) => {
                                           return item;
                                         })
                                         .join(", ")
-                                      })</span>
+                                      })</span> */}
                                     </p>
                                     <p className="font-12 mb-1">
                                       {item.id}

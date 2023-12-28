@@ -20,7 +20,7 @@ const AddProduct = () => {
   console.log(selectedCategory, "selectetCategory");
 
   const [attributes, setAttributes] = useState([]);
-
+  console.log(attributes, "attributes")
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -31,7 +31,7 @@ const AddProduct = () => {
   console.log(itemsArray, "itemsArray");
 
   const [images, setImages] = useState([null, null, null, null]);
-
+  console.log(images, "images")
 
   const [mainCategoryList, setMainCategoryList] = useState([]);
 
@@ -169,7 +169,6 @@ const AddProduct = () => {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    console.log(itemsArray, "itemsArray");
     // const categoryIdsArray = [];
     // categoryIdsArray.push(selectedCategory);
     // categoryIdsArray.push(selectedSubCategory);
@@ -180,6 +179,12 @@ const AddProduct = () => {
     data.append("price", price);
     // data.append("qty", +itemsArray[0]?.quantity);
     data.append("des", description);
+    // data.append("img", images);
+    images.forEach((image, index) => {
+      if (image) {
+          data.append(`img[${index}]`, image);
+      }
+  });
     data.append("org_id", userInfo?.organizationData?.org_id);
     data.append("categoryId", selectedCategory.category_id);
     data.append("user_id", userInfo?.user_id);
@@ -187,9 +192,6 @@ const AddProduct = () => {
     data.append("itemsArray", JSON.stringify(itemsArray));
     data.append("specifications", JSON.stringify(inputFields));
     // console log all the data
-    for (var pair of data.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
 
     fetch(`${import.meta.env.VITE_SERVER}/product/addProduct`, {
       method: "POST",
@@ -251,6 +253,12 @@ const AddProduct = () => {
         </>
     ))
 };
+
+  const handleImageUpload = (event, index) => {
+    const updatedImages = [...images];
+    updatedImages[index] = event.target.files[0];
+    setImages(updatedImages);
+  };
 
   return (
     <div className="container-fluid overflow-x-hidden bg-white min-vh-84">
