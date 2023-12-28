@@ -92,7 +92,6 @@ const ProductList = () => {
   const { userInfo } = useAuth();
 
   const [data, setData] = useState([]);
-  console.log(data)
   const getAllProducts = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);

@@ -175,12 +175,10 @@ const Invoices = () => {
   ];
 
   const { userInfo } = useAuth();
-  console.log(userInfo);
   const [storeList, setStoreList] = useState([]);
   const [store, setStore] = useState(null);
   const [update, setUpdate] = useState(0);
   const [allInvoiceInfoItem, setAllInvoiceInfoItem] = useState([]);
-  console.log(allInvoiceInfoItem);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
@@ -219,7 +217,6 @@ const Invoices = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   const handleSelect = (id) => {
-    console.log(id);
     const data = new FormData();
     data.append("sale_id", id);
     data.append("org_id", userInfo?.organizationData?.org_id);
@@ -229,14 +226,12 @@ const Invoices = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setSelectedInvoice(res.invoice);
       })
       .catch((err) => console.log(err));
   };
 
   const handlePrint = (id) => {
-    console.log(id);
     const data = new FormData();
     data.append("sale_id", id);
 
@@ -246,7 +241,6 @@ const Invoices = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setInvoice(res);
       })
       .catch((err) => console.log(err));

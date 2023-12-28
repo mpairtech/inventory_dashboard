@@ -4,7 +4,6 @@ import { useAuth } from '../../providers/AuthProvider';
 
 const TopBar = () => {
   const { userInfo } = useAuth();
-  console.log(userInfo)
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -59,14 +58,6 @@ const TopBar = () => {
                       </p>
                       <div className="bg-light p-1 px-2 rounded-2">
 
-                        <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
-                          <Link to="/online-order" className="ms-auto">
-                            <div className=" text-dark  ">
-                              <i className="fa-solid fa-globe me-2 text-blue fa-lg"></i>
-                              Online Order
-                            </div>
-                          </Link>
-                        </div>
 
                         {
                           userInfo.store_id !== "0" ?
@@ -79,32 +70,6 @@ const TopBar = () => {
                               </Link>
                             </div> : <></>
                         }
-
-                        <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
-                          <Link to="/banner" className="ms-auto">
-                            <div className=" text-dark  ">
-                              <i className="fa-solid fa-image me-2 fa-lg"></i>
-                              Add Feature Banner
-                            </div>
-                          </Link>
-                        </div>
-
-                        <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
-                          <Link to="/sale-banner" className="ms-auto">
-                            <div className=" text-dark  ">
-                              <i className="fa-solid fa-flag me-2 text-orange fa-lg"></i>
-                              Add Cover Banner
-                            </div>
-                          </Link>
-                        </div>
-                        <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
-                          <Link to="/coupon-code" className="ms-auto">
-                            <div className=" text-dark  ">
-                              <i className="fa-solid fa-flag me-2 text-orange fa-lg"></i>
-                              Add Coupon
-                            </div>
-                          </Link>
-                        </div>
 
 
                         <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">

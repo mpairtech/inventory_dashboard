@@ -7,7 +7,6 @@ const CustomizeCategory = () => {
     const navigate = useNavigate();
 
     const { userInfo } = useAuth();
-    console.log(userInfo)
     const [update, setUpdate] = useState(false);
 
 
@@ -15,11 +14,8 @@ const CustomizeCategory = () => {
     const [name, setName] = useState("");
 
     const [allMainCategories, setAllMainCategories] = useState([]);
-    console.log(allMainCategories)
     const [parentCategory, setParentCategory] = useState(null)
-    console.log(parentCategory);
 
-    console.log(img?.name)
 
     const addCategory = (e) => {
         e.preventDefault();
@@ -41,7 +37,6 @@ const CustomizeCategory = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 if (res.category_id) {
                     toast.success("Category Setup Successful");
                     setUpdate(!update);

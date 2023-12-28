@@ -3,9 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../providers/AuthProvider";
 
 const Navbar = () => {
-
   const { userInfo } = useAuth();
-  console.log(userInfo)
   return (
     <div className="container-fluid pos-primary noprint">
       <div className="row">

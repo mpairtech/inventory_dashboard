@@ -30,8 +30,6 @@ const Pos = () => {
   };
   const { userInfo } = useAuth();
 
-  console.log(userInfo);
-
   const [refTotal, setRefTotal] = useState();
 
   const [searchedProducts, setSearchedProducts] = useState([]);
@@ -191,7 +189,6 @@ const Pos = () => {
     }
   }, [dis, fixedDiscount, updateCount, items]);
 
-  console.log(items)
 
   useEffect(() => {
     if (localStorage.getItem("items") != null) {
@@ -220,7 +217,6 @@ const Pos = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setSearchedProducts(res);
       })
       .catch((err) => console.log(err));
@@ -287,9 +283,6 @@ const Pos = () => {
   });
 
 
-
-  console.log(Math.random().toString(36).substr(2, 9))
-
   function handleSubmitSale() {
     if (refTotal !== +cashAmount + +cardAmount + +otherAmount) {
       console.log(refTotal, +cashAmount + +cardAmount + +otherAmount)
@@ -341,10 +334,8 @@ const Pos = () => {
       })
         .then((res) => res.json())
         .then((res) => {
-          console.log(res)
           if (res.success) {
             setInvoiceLoading(false);
-            console.log(items)
             items?.map((item) => {
               const data = new FormData();
               data.append("sale_id", res.result.sale_id);
@@ -360,7 +351,6 @@ const Pos = () => {
               })
                 .then((res) => res.json())
                 .then((res) => {
-                  console.log(res)
                   if (res.success) {
                     // toast.success("Product sold !", {
                     //   icon: "🛒",
@@ -419,7 +409,6 @@ const Pos = () => {
   }
 
   function decreaseItem(index, i) {
-    console.log(i, "hi")
     i--;
     if (i < 1) {
       i = 1;
@@ -431,7 +420,6 @@ const Pos = () => {
   }
 
   function removeItem(x) {
-    console.log("hi", x)
     var all = JSON.parse(localStorage.getItem("items"));
     all.splice(x, 1);
     localStorage.setItem("items", JSON.stringify(all));
@@ -453,10 +441,8 @@ const Pos = () => {
 
 
   const [allMainCategories, setAllMainCategories] = useState([]);
-  console.log(allMainCategories)
   const [data, setData] = useState([]);
 
-  console.log(data);
   const [activeCategory, setActiveCategory] = useState(0);
 
   const getAllCategories = () => {
@@ -486,7 +472,6 @@ const Pos = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setData(res);
       })
       .catch((err) => console.log(err));
@@ -501,7 +486,6 @@ const Pos = () => {
   }, [activeCategory]);
 
   const navigate = useNavigate();
-  console.log(items)
   return (
     <>
       <div onClick={() => setShow(false)} className="container-fluid noprint bg-light2" style={{ height: "100vh" }}>

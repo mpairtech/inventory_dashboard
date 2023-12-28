@@ -7,7 +7,6 @@ import { useAuth } from "../providers/AuthProvider";
 
 const AddProduct = () => {
   const { userInfo } = useAuth();
-  console.log(userInfo, "userInfo");
 
   const navigate = useNavigate();
   const [load, setLoad] = useState(false);
@@ -17,10 +16,8 @@ const AddProduct = () => {
   const [productName, setProductName] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState(null);
-  console.log(selectedCategory, "selectetCategory");
 
   const [attributes, setAttributes] = useState([]);
-  console.log(attributes, "attributes")
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -31,7 +28,6 @@ const AddProduct = () => {
   console.log(itemsArray, "itemsArray");
 
   const [images, setImages] = useState([null, null, null, null]);
-  console.log(images, "images")
 
   const [mainCategoryList, setMainCategoryList] = useState([]);
 
@@ -64,7 +60,6 @@ const AddProduct = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setMainCategoryList(
           res.filter((category) => category.parent_id === null)
         );
@@ -133,7 +128,6 @@ const AddProduct = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setAttributeList(res);
       })
       .catch((err) => console.log(err));
@@ -165,7 +159,6 @@ const AddProduct = () => {
   }, [selectedAttribute]);
 
 
-  console.log(itemsArray)
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -199,7 +192,6 @@ const AddProduct = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         if (res.product_id) {
           toast.success("Product Added Successfully");
           navigate("/product-list");
@@ -225,7 +217,6 @@ const AddProduct = () => {
   // specification
 
   const [inputFields, setInputFields] = useState([{ key: '', value: '' }]);
-  console.log(inputFields, "inputFields")
   const handleInputChange = (index, event) => {
     const values = [...inputFields];
     if (event.target.name === "key") {

@@ -108,7 +108,6 @@ const CustomizeEmployee = () => {
   ];
 
   const { userInfo } = useAuth();
-  console.log(userInfo);
   const [update, setUpdate] = useState(false);
 
   const [employeeName, setEmployeeName] = useState("");
@@ -138,7 +137,6 @@ const CustomizeEmployee = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         if (res?.employee_id) {
           toast.success("Employee added successfully");
           setUpdate(!update);
@@ -152,10 +150,8 @@ const CustomizeEmployee = () => {
   };
 
   const [userList, setUserList] = useState([]);
-  console.log(userList);
 
   const [storeList, setStoreList] = useState([]);
-  console.log(storeList);
 
   const getAllEmployee = () => {
     const data = new FormData();
@@ -203,7 +199,6 @@ const CustomizeEmployee = () => {
   }, [update, searchField]);
 
   const handleDelete = (id) => {
-    console.log(id);
     const data = new FormData();
     data.append("user_id", id);
     fetch(`${import.meta.env.VITE_SERVER}/authority/deleteUser`, {

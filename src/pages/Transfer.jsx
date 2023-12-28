@@ -65,10 +65,8 @@ const Transfer = () => {
   const { userInfo } = useAuth();
 
   const [data, setData] = useState([]);
-  console.log(data)
   const [transferTo, setTransferTo] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
-  console.log(selectedProducts)
   const [date, setDate] = useState("");
   const [storeList, setStoreList] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
@@ -113,7 +111,6 @@ const Transfer = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setData(res);
       })
       .catch((err) => console.log(err));
@@ -128,7 +125,6 @@ const Transfer = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setStoreList(res);
       })
       .catch((err) => console.log(err));
@@ -145,7 +141,6 @@ const Transfer = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setSearchedProducts(res);
       })
       .catch((err) => console.log(err));
@@ -185,7 +180,6 @@ const Transfer = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         toast.success("Product Transferred");
         // setUpdate(update + 1);
       })

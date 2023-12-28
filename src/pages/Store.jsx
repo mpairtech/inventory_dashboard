@@ -5,7 +5,6 @@ import { useAuth } from "../providers/AuthProvider";
 const Store = () => {
   const [data, setData] = useState([]);
   const { userInfo } = useAuth();
-  console.log(userInfo);
   const getAllStore = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
@@ -15,7 +14,6 @@ const Store = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setData(res);
       })
       .catch((err) => console.log(err));

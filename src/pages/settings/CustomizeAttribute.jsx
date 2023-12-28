@@ -49,7 +49,6 @@ const CustomizeAttribute = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 setAttributeList(res);
             })
             .catch((err) => console.log(err));
@@ -69,7 +68,6 @@ const CustomizeAttribute = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 toast.success("Attribute Deleted Successfully");
                 setUpdate(!update);
             })
@@ -97,7 +95,6 @@ const CustomizeAttribute = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 if (res.attribute_value_id) {
                     toast.success("Attribute Value Added Successfull");
                     setUpdate(!update);
@@ -120,7 +117,6 @@ const CustomizeAttribute = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 setAttributeValueList(res);
             })
             .catch((err) => console.log(err));
@@ -141,7 +137,6 @@ const CustomizeAttribute = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 toast.success("Attribute Value Deleted Successfully");
                 setUpdate(!update);
             })

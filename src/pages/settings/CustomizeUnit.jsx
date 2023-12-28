@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 const CustomizeUnit = () => {
     const navigate = useNavigate();
     const { userInfo } = useAuth();
-    console.log(userInfo);
 
     const [update, setUpdate] = useState(false);
 
@@ -25,7 +24,6 @@ const CustomizeUnit = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 if (res.unit_id) {
                     toast.success("Unit Added Successfull");
                     setUpdate(!update);
@@ -48,7 +46,6 @@ const CustomizeUnit = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 setUnitList(res);
             })
             .catch((err) => console.log(err));

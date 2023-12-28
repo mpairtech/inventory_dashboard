@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 const Setup = () => {
     const navigate = useNavigate();
     const { userInfo, authUpdate, setAuthUpdate } = useAuth();
-    console.log(userInfo?.user_id);
 
     const [update, setUpdate] = useState(0);
 
@@ -39,7 +38,6 @@ const Setup = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 if (res?.message) {
                     setAuthUpdate(!authUpdate);
                     toast.success(res?.message);

@@ -16,9 +16,6 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("Organization");
   const { userInfo } = useAuth();
 
-  console.log(userInfo.user_id);
-
-
   return (
     <div className="container-fluid ">
       <div className="row px-0">
@@ -40,7 +37,7 @@ const Settings = () => {
                   </button>
                 </div>
 
-                <div className="mt-2 mx-2" >
+                {/* <div className="mt-2 mx-2" >
                   <button
                     className={`w-100  text-start font-13 d-flex justify-content-between align-items-center my-1 fs-6 px-2 ${activeTab === "Store" ? "btn_active" : "btn_inactive"}`}
                     onClick={() => setActiveTab("Store")}
@@ -48,9 +45,9 @@ const Settings = () => {
                     Store
                     <i className="fa-solid fa-angle-right"></i>
                   </button>
-                </div>
+                </div> */}
 
-                <div className="mt-2 mx-2" >
+                {/* <div className="mt-2 mx-2" >
                   <button
                     className={`w-100  text-start font-13 d-flex justify-content-between align-items-center my-1 fs-6 px-2 ${activeTab === "User" ? "btn_active" : "btn_inactive"}`}
                     onClick={() => setActiveTab("User")}
@@ -58,7 +55,7 @@ const Settings = () => {
                     User
                     <i className="fa-solid fa-angle-right"></i>
                   </button>
-                </div>
+                </div> */}
                 <div className="mt-2 mx-2" >
                   <button
                     className={`w-100  text-start font-13 d-flex justify-content-between align-items-center my-1 fs-6 px-2 ${activeTab === "Employee" ? "btn_active" : "btn_inactive"}`}

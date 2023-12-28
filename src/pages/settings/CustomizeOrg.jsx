@@ -34,7 +34,6 @@ const CustomizeOrg = () => {
         })
             .then((res) => res.json())
             .then((res) => {
-                console.log(res);
                 if (res.id) {
                     toast.success("User added successfully");
                     setUpdate((prevUpdate) => prevUpdate + 1);
