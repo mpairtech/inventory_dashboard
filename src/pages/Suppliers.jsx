@@ -85,7 +85,7 @@ const Suppliers = () => {
             data-bs-toggle="modal"
             data-bs-target={`#exampleModalDelete${row.expense_id}`}
           >
-            <i className="fa-solid fa-trash fa-lg fa-icon  red"></i>
+            <i className="fa-solid fa-trash fa-lg fa-icon text-danger "></i>
           </button>
           <div
             className="modal fade "

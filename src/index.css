@@ -57,6 +57,19 @@ input::-webkit-inner-spin-button {
   background: rgb(82, 82, 82);
 }
 
+.form-control {
+  box-sizing: border-box !important; /* Add this line */
+  border: 2px solid #9494944e !important;
+  border-radius: 4px !important;
+}
+
+.form-control:focus {
+  border-radius: 4px !important;
+  border: 2px solid #0099d1 !important;
+  box-shadow: none !important;
+}
+
+
 body {
   font-family: "Roboto", sans-serif !important;
   background-color: #ffffff !important;
@@ -333,9 +346,8 @@ border-radius: 5px;
   background-color: #1b2850;
   color: #ffffff;
   border: none;
-  transition: all 0.1s ease-in-out;
   font-size: 14px;
-  padding: 6px 10px;
+  padding: 8px 10px;
   border-radius: 3px;
   font-weight: 500;
 }

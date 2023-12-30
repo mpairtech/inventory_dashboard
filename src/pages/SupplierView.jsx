@@ -141,6 +141,8 @@ const SupplierView = () => {
   const [supplierData, setSupplierData] = useState({});
   console.log(supplierData)
 
+  const [activeTab, setActiveTab] = useState("report");
+
   const getSupplierData = () => {
     const data = new FormData();
     data.append("supplier_id", supplier_id);
@@ -173,7 +175,7 @@ const SupplierView = () => {
         <div className="container">
           <div className="min-vh-66 row ">
             <div className="col-lg-12 ">
-              
+
               <div className="row bg-white ">
                 <div class="col-lg-6 mb-5">
                   <div className="card border min-vh-70">
@@ -183,7 +185,7 @@ const SupplierView = () => {
                       </p>
                       <table className="table ">
                         <tbody>
-                     
+
                           <tr className="">
                             <td>
                               <p className="mb-0 ms-2 align-middle py-2 font-12 fw-600 text-muted">
@@ -293,16 +295,329 @@ const SupplierView = () => {
                 <div className="col-lg-6">
                   <div className="card border min-vh-70">
                     <div className="card-body px-0 pb-1">
-                      <DataTable
-                        className="px-0"
-                        columns={columns}
-                        // data={data}
-                        dense
-                        pagination
-                        paginationPerPage={6}
-                        center
-                        customStyles={customStyles}
-                      />
+                      <div className="d-flex gap-2 mx-3 ">
+                        <button
+                          onClick={() => setActiveTab("report")}
+                          className={`w-100 ${activeTab === "report" ? "btn_active3" : "btn_inactive3"}`}>
+                          Report
+                        </button>
+                        <button
+                          onClick={() => setActiveTab("transaction")}
+                          className={`w-100 ${activeTab === "transaction" ? "btn_active3" : "btn_inactive3"}`}>
+                          Transaction
+                        </button>
+                        <button
+                          onClick={() => setActiveTab("bill")}
+                          className={`w-100 ${activeTab === "bill" ? "btn_active3" : "btn_inactive3"}`}>
+                          Bill
+                        </button>
+
+                      </div>
+
+                      {activeTab === "report" && (
+                        <div
+                          id="printarea"
+                          className="mx-3 mt-3 border shadow-sm bg-white py-4 "
+                        >
+                          <p className="font-18 mb-0 text-center">Inventory Report</p>
+                          <p className="font-16 mb-0 text-center">ORG NAME</p>
+                          <p className="font-14 text-center mb-0">Supplier List</p>
+                          <p className="font-12 text-center my-1">
+                            Date: {new Date().toLocaleDateString()}
+                          </p>
+                          <p className="font-12 text-center my-1">NOTE: All amounts are shown in BDT.</p>
+                          <table className="table align-middle mt-2">
+                            <thead>
+                              <tr className="thead-color border">
+                                <th
+                                  scope="col"
+                                  className="border-0 font-13 text-muted font-weight-600 ps-4"
+                                  width="10%"
+                                >
+                                </th>
+                                <th
+                                  scope="col"
+                                  className="border-0 font-13 text-muted font-weight-600 ps-4"
+                                  width="60%"
+                                >
+                                  Name
+                                </th>
+
+                                <th
+                                  scope="col"
+                                  className="border-0 font-13 text-muted font-weight-600"
+                                  width="30%"
+                                >
+                                  Amount
+                                </th>
+
+                              </tr>
+                            </thead>
+                            <tbody className="border-0">
+
+                              <tr className="border-bottom">
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                  Total Sell
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 font-weight-600"
+                                >
+                                  <span
+                                    className="d-inline-block text-truncate"
+                                    style={{ maxWidth: "250px" }}
+                                  >
+                                    123
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr className="border-bottom">
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                  Total Amount
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 font-weight-600"
+                                >
+                                  <span
+                                    className="d-inline-block text-truncate"
+                                    style={{ maxWidth: "250px" }}
+                                  >
+                                    123
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr className="border-bottom">
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                  Cash Payments
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 font-weight-600"
+                                >
+                                  <span
+                                    className="d-inline-block text-truncate"
+                                    style={{ maxWidth: "250px" }}
+                                  >
+                                    123
+                                  </span>
+                                </td>
+                              </tr>
+
+                              <tr className="border-bottom">
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4 fw-medium"
+                                >
+                                  Bank Payments
+                                </td>
+                              </tr>
+                              <tr className="border-bottom">
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                  DBBL
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 font-weight-600"
+                                >
+                                  <span
+                                    className="d-inline-block text-truncate"
+                                    style={{ maxWidth: "250px" }}
+                                  >
+                                    123
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr className="border-bottom">
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 ps-4"
+                                >
+                                  The City Bank
+                                </td>
+                                <td
+                                  scope="col"
+                                  className="border-0 font-12 font-weight-600"
+                                >
+                                  <span
+                                    className="d-inline-block text-truncate"
+                                    style={{ maxWidth: "250px" }}
+                                  >
+                                    456
+                                  </span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {activeTab === "transaction" && (
+                        <div className="mt-3 mx-3">
+                          <div className="row">
+                            <form onSubmit={{}} className="col-lg-12 ">
+                              <div className="">
+                                <p
+                                  className=""
+                                >
+                                  Add New Transaction
+                                </p>
+                              </div>
+                                <div
+                                  className="col-lg-12 "
+                                >
+                                  <div className="row">
+                                    <div className=" col-lg-6">
+                                      <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted "
+                                      >
+                                        Supplier Name
+                                      </label>
+                                      <input
+                                        type="text"
+                                        className="form-control font-13 shadow-none bg-white"
+                                        onChange={(e) => setSupplierName(e.target.value)}
+                                      />
+                                    </div>
+                                    <div className="col-lg-6">
+                                      <label
+                                        htmlFor="recipient-name"
+                                        className="col-form-label text-muted "
+                                      >
+                                        Supplier Type
+                                      </label>
+                                      <select
+                                        className="form-control font-13 shadow-none"
+                                        onChange={(e) => setSupplierType(e.target.value)}
+                                      >
+                                        <option selected disabled value="">
+                                          Select Supplier Type
+                                        </option>
+                                        <option value="test">
+                                          test
+                                        </option>
+                                      </select>
+                                    </div>
+
+                                    <div className="col-lg-6">
+                                      <label
+                                        className="col-form-label text-muted "
+                                      >
+                                        Contact Person
+                                      </label>
+                                      <input
+                                        className="form-control font-13 shadow-none bg-white"
+                                        onChange={(e) => setContactPerson(e.target.value)}
+                                      />
+                                    </div>
+
+                                    <div className="col-lg-6">
+                                      <label
+                                        className="col-form-label text-muted"
+                                      >
+                                        Contact Number
+                                      </label>
+                                      <input
+                                        className="form-control font-13 shadow-none bg-white"
+                                        onChange={(e) => setContactNumber(e.target.value)}
+                                      />
+                                    </div>
+                                    <div className=" col-lg-6">
+                                      <label
+                                        htmlFor="message-text"
+                                        className="col-form-label text-muted "
+                                      >
+                                        Location
+                                      </label>
+                                      <input
+                                        className="form-control font-13 shadow-none bg-white"
+                                        onChange={(e) => setLocation(e.target.value)}
+                                      />
+                                    </div>
+                                    <div className="col-lg-6">
+                                      <label
+                                        htmlFor="message-text"
+                                        className="col-form-label text-muted "
+                                      >
+                                        Opening Balance
+                                      </label>
+                                      <input
+                                        type="number"
+                                        className="form-control font-13 shadow-none bg-white"
+                                        onChange={(e) => setOpBalance(e.target.value)}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              <div className="modal-footer">
+                                <button
+                                  type="submit"
+                                  className="btn_primary mt-3"
+                                >
+                                  Submit
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                          <div>
+                            <DataTable
+                              noHeader
+                              columns={columns}
+                              data={[]}
+                              customStyles={customStyles}
+                              pagination
+                              paginationPerPage={5}
+                              paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
+                              className="table table-bordered"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+
                     </div>
                   </div>
                 </div>
