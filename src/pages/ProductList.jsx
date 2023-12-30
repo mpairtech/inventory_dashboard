@@ -44,12 +44,12 @@ const ProductList = () => {
     },
     {
       name: "Category",
-      selector: (row) => row.cat,
-      width: "15%",
+      selector: (row) => row?.category?.name,
+      width: "20%",
     },
     {
-      name: "Colour",
-      selector: (row) => row.color,
+      name: "Brand",
+      selector: (row) => row?.brand,
       width: "15%",
     },
     // {
@@ -92,6 +92,7 @@ const ProductList = () => {
   const { userInfo } = useAuth();
 
   const [data, setData] = useState([]);
+  console.log(data)
   const getAllProducts = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);

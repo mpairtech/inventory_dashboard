@@ -65,9 +65,10 @@ const Transfer = () => {
   const { userInfo } = useAuth();
 
   const [data, setData] = useState([]);
+  console.log(data)
   const [transferTo, setTransferTo] = useState("");
+  console.log(transferTo)
   const [selectedProducts, setSelectedProducts] = useState([]);
-  console.log(selectedProducts)
   const [date, setDate] = useState("");
   const [storeList, setStoreList] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
@@ -164,7 +165,7 @@ const Transfer = () => {
     getAllTransfers();
   }, [update, searchField]);
 
-  console.log(searchedProducts)
+  console.log(selectedProducts)
 
   const handleMakeTransfer = (e) => {
     e.preventDefault();
@@ -180,7 +181,9 @@ const Transfer = () => {
     data.append("store_to", transferTo);
     data.append("selectedProducts", JSON.stringify(selectedProducts));
     data.append("date", date);
-    // data.append("variations", JSON.stringify(selectedVariations));
+
+
+    data.append("variations", JSON.stringify(selectedVariations));
 
     fetch(`${import.meta.env.VITE_SERVER}/stock/transferProducts`, {
       method: "POST",
@@ -189,7 +192,7 @@ const Transfer = () => {
       .then((res) => res.json())
       .then((res) => {
         toast.success("Product Transferred");
-        // setUpdate(update + 1);
+        setUpdate(update + 1);
       })
       .catch((err) => console.log(err));
   };
@@ -373,16 +376,16 @@ const Transfer = () => {
                                       placeholder="Quantity"
                                       onChange={(e) => {
                                         const productId = item.product_id;
-                                        const quantity = parseInt(e.target.value);
+                                        const t_qty = parseInt(e.target.value);
                                         const updatedProducts = [...selectedProducts];
                                         const existingIndex = updatedProducts.findIndex((p) => p.product_id === productId);
 
                                         if (existingIndex !== -1) {
                                           // If product ID already exists, update the quantity
-                                          updatedProducts[existingIndex].quantity = quantity;
+                                          updatedProducts[existingIndex].t_qty = t_qty;
                                         } else {
                                           // If product ID doesn't exist, add it to the array
-                                          updatedProducts.push({ productId, quantity });
+                                          updatedProducts.push({ productId, t_qty });
                                         }
 
                                         setSelectedProducts(updatedProducts);
