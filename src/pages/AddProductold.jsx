@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useAuth } from "../providers/AuthProvider";
-import CreatableSelect from 'react-select/creatable';
+
 const AddProduct = () => {
   const { userInfo } = useAuth();
 
@@ -18,59 +18,18 @@ const AddProduct = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const [attributes, setAttributes] = useState([]);
-  // const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
 
   const [index, setIndex] = useState(1);
+  const [itemsArray, setItemsArray] = useState([]);
+
+  console.log(itemsArray, "itemsArray");
 
   const [images, setImages] = useState([null, null, null, null]);
 
   const [mainCategoryList, setMainCategoryList] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState([]);
-  const [selectedBrand, setSelectedBrand] = useState(null);
-  console.log(selectedBrand, "selectedBrand")
-  const [brandList, setBrandList] = useState([]);
-  console.log(brandList, "brandList")
-
-  const getAllBrands = () => {
-    const data = new FormData();
-    data.append("org_id", userInfo?.organizationData?.org_id);
-    fetch(`${import.meta.env.VITE_SERVER}/product/getAllBrandsForOrg`, {
-      method: "POST",
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setBrandList(res);
-        setOptions(res.map((brand) => ({ label: brand.name, value: brand.id })));
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const handleCreate = (inputValue) => {
-    setIsLoading(true);
-    fetch(`${import.meta.env.VITE_SERVER}/product/addBrand`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: inputValue,
-        org_id: userInfo?.organizationData?.org_id,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        const newBrand = { label: res.name, value: res.id };
-        setIsLoading(false);
-        setOptions((prevOptions) => [...prevOptions, newBrand]);
-        setSelectedBrand(newBrand);
-      })
-      .catch((err) => console.error(err));
-  };
 
   const getLastProductId = () => {
     const date = new Date();
@@ -91,7 +50,6 @@ const AddProduct = () => {
   };
 
 
-
   const getAllCategories = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
@@ -109,30 +67,57 @@ const AddProduct = () => {
       .catch((err) => console.log(err));
   };
 
-  const [selectedAttributes, setSelectedAttributes] = useState({});
-  const [quantity, setQuantity] = useState('');
-  const [variantList, setVariantList] = useState([]);
-
-  console.log(variantList, "variantList")
-
-  // console.log(selectedAttributes, "selectedAttributes")
 
   const addVariant = (e) => {
+    console.log(attributes)
+    // attributes [ '30', 'Red' ]
+    console.log(itemsArray)
+    // itemsArray { attributes: [ '30', 'Red' ], quantity: 123 }
     e.preventDefault();
+    // const existingItem = itemsArray.find(item => (JSON.stringify(item.attributes)) === (JSON.stringify(attributes)));
+    const existingItem = itemsArray.find(item => {
 
-    const newVariant = Object.keys(selectedAttributes).map((attributeName) => ({
-      name: attributeName,
-      value: selectedAttributes[attributeName],
-    }));
+      if (item.attributes.length !== attributes.length) {
+        return false;
+      }
+      const sortedArr1 = item.attributes.slice().sort();
+      const sortedArr2 = attributes.slice().sort();
 
-    setVariantList([...variantList, { attributes: newVariant, quantity }]);
-    // Optionally, you can reset the form values after submission
-    setQuantity('');
-    setSelectedAttributes({});
+      for (let i = 0; i < sortedArr1.length; i++) {
+        if (sortedArr1[i] !== sortedArr2[i]) {
+          return false;
+        }
+      }
+      return true;
+
+    });
+
+    console.log(existingItem, "existingItem")
+    if (existingItem) {
+      const updatedItemsArray = itemsArray.map(item =>
+        item.attributes === attributes ? { ...item, quantity: item.quantity + parseInt(quantity, 10) } : item
+      );
+      setItemsArray(updatedItemsArray);
+      document.getElementById("variantForm").reset();
+    } else {
+      const newObject = {
+        attributes: attributes,
+        quantity: parseInt(quantity, 10),
+      };
+      setItemsArray([...itemsArray, newObject]);
+      document.getElementById("variantForm").reset();
+    }
+
+    setAttributes([]);
+    setQuantity("");
+
   };
 
 
+
   const [attributeList, setAttributeList] = useState([]);
+  console.log(attributeList, "attributeList")
+  const [selectedAttribute, setSelectedAttribute] = useState("");
 
   const getAllAttributes = () => {
     const data = new FormData();
@@ -150,30 +135,56 @@ const AddProduct = () => {
 
   useEffect(() => {
     getAllAttributes();
-    getAllBrands();
   }, []);
+
+
+  const [attributeValueList, setAttributeValueList] = useState([]);
+
+  const getAllAttributeValues = () => {
+    const data = new FormData();
+    fetch(`${import.meta.env.VITE_SERVER}/product/getAllAttributeValues`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setAttributeValueList(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getAllAttributeValues();
+  }, [selectedAttribute]);
 
 
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    setLoad(true);
+    // const categoryIdsArray = [];
+    // categoryIdsArray.push(selectedCategory);
+    // categoryIdsArray.push(selectedSubCategory);
+
     const data = new FormData();
     data.append("product_id", productId);
     data.append("name", productName);
     data.append("price", price);
+    // data.append("qty", +itemsArray[0]?.quantity);
     data.append("des", description);
+    // data.append("img", images);
     images.forEach((image, index) => {
       if (image) {
-        data.append(`img[${index}]`, image);
+          data.append(`img[${index}]`, image);
       }
-    });
+  });
     data.append("org_id", userInfo?.organizationData?.org_id);
     data.append("categoryId", selectedCategory.category_id);
     data.append("user_id", userInfo?.user_id);
-    data.append("brand_id", selectedBrand?.value);
-    data.append("variantList", JSON.stringify(variantList));
+    // data.append("categoryIds", JSON.stringify(categoryIdsArray));
+    data.append("itemsArray", JSON.stringify(itemsArray));
     data.append("specifications", JSON.stringify(inputFields));
+    // console log all the data
 
     fetch(`${import.meta.env.VITE_SERVER}/product/addProduct`, {
       method: "POST",
@@ -181,8 +192,6 @@ const AddProduct = () => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
-        setLoad(false);
         if (res.product_id) {
           toast.success("Product Added Successfully");
           navigate("/product-list");
@@ -230,17 +239,17 @@ const AddProduct = () => {
 
   const renderNestedCategories = (categories, depth = 1) => {
     return categories.map((category) => (
-      <>
-        <option key={category.category_id} value={JSON.stringify(category)}
+        <>
+            <option key={category.category_id} value={JSON.stringify(category)}
 
-        >
-          {'━'.repeat(depth)} {category.name}
-        </option>
-        {category.subcategories && category.subcategories.length > 0 &&
-          renderNestedCategories(category.subcategories, depth + 1)}
-      </>
+            >
+                {'━'.repeat(depth)} {category.name}
+            </option>
+            {category.subcategories && category.subcategories.length > 0 &&
+                renderNestedCategories(category.subcategories, depth + 1)}
+        </>
     ))
-  };
+};
 
   const handleImageUpload = (event, index) => {
     const updatedImages = [...images];
@@ -329,14 +338,14 @@ const AddProduct = () => {
                               <label className="form-label addempfont">
                                 Select Category
                               </label>
-                              <select
-                                onChange={
-                                  (e) => setSelectedCategory(JSON.parse(e.target.value))
-                                }
-                                className='form-control shadow-none '>
-                                <option value={null}>Select category</option>
-                                {renderNestedCategories(mainCategoryList)}
-                              </select>
+                              <select 
+                                    onChange={
+                                        (e) => setSelectedCategory(JSON.parse(e.target.value))
+                                    }
+                                    className='form-control shadow-none '>
+                                        <option value={null}>Select category</option>
+                                        {renderNestedCategories(mainCategoryList)}
+                                    </select>
                             </div>
                           </div>
 
@@ -452,18 +461,24 @@ const AddProduct = () => {
                     <select
                       className="form-control py-2 font-13 shadow-none"
                       onChange={(e) => {
-                        setSelectedAttributes({
-                          ...selectedAttributes,
-                          [attribute.name]: e.target.value,
-                        });
+                        let attributesArray = [...attributes];
+                        if (e.target.value !== "") {
+                          attributesArray.push(e.target.value);
+                          setAttributes(attributesArray);
+                        }
                       }}
+                      // value={attributes}
+                      placeholder="Choose size"
+                      id="size"
                     >
-                      <option selected disabled className="shadow-none" value="">
+                      <option className="shadow-none" value="">
                         Choose
                       </option>
-                      {attribute?.attribute_values?.map((item) => (
-                        <option key={item.value} value={item.value}>{item.value}</option>
-                      ))}
+                      {attributeValueList
+                        .filter((item) => item.parent_id === attribute.attribute_id)
+                        .map((item) => (
+                          <option key={item.value} value={item.value}>{item.value}</option>
+                        ))}
                     </select>
                   </div>
                 </div>
@@ -474,7 +489,7 @@ const AddProduct = () => {
               <div className="mb-1 text-muted">
                 <label className="form-label addempfont">Quantity</label>
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Enter quantity"
                   className="form-control py-2 font-13 shadow-none"
                   onChange={(e) => setQuantity(e.target.value)}
@@ -493,9 +508,8 @@ const AddProduct = () => {
             </div>
           </form>
 
-          {/* variation table */}
-          <div className="mb-3 rounded-2">
-            {variantList.length !== 0 && (
+          <div className="mb-3 rounded-2 ">
+            {itemsArray.length !== 0 && (
               <>
                 <div
                   className="row mx-1 mt-2 p-1 pb-0 border  d-flex  justify-content-between"
@@ -508,7 +522,9 @@ const AddProduct = () => {
                     <label className="form-label fw-bold label1">Att Values</label>
                   </div>
                   <div className="col-2">
-                    <label className="form-label fw-bold label1">Quantity</label>
+                    <label className="form-label fw-bold label1">
+                      Quantity
+                    </label>
                   </div>
 
                   <div className="col-1">
@@ -518,60 +534,48 @@ const AddProduct = () => {
               </>
             )}
 
-            {variantList?.map((item, index) => (
-              <div
-                className="row pt-1 mx-1 border-start border-end border-bottom d-flex  justify-content-between"
-                key={index}
-              >
-                <div className="col-1">
-                  <p className="form-label label1 ms-2">{index + 1}</p>
-                </div>
-                <div className="col-2">
-                  <p className="form-label label1 ms-2">
-                    {(item.attributes || []).map((attr) => `${attr.name}: ${attr.value}`).join(", ")}
-                  </p>
-                </div>
-                <div className="col-2  ">
-                  <p className="form-label label1 ms-3">{item.quantity}</p>
-                </div>
+            {itemsArray?.map((item, index) => {
+              return (
+                <>
+                  <div
+                    className="row pt-1 mx-1 border-start border-end border-bottom d-flex  justify-content-between"
+                    key={item.id}
+                  >
+                    <div className="col-1">
+                      <p className="form-label label1 ms-2">{index + 1}</p>
+                    </div>
+                    <div className="col-2">
+                      <p className="form-label label1 ms-2"> {(item?.attributes)?.join(", ")}</p>
+                    </div>
+                    <div className="col-2  ">
+                      <p className="form-label label1 ms-3"> {item?.quantity}</p>
+                    </div>
 
-                <div className="col-1">
-                  <i
-                    className="fa-solid fa-xmark fa-icon text-danger ms-3 pointer"
-                    onClick={() => {
-                      const updatedVariantList = [...variantList];
-                      updatedVariantList.splice(index, 1);
-                      setVariantList(updatedVariantList);
-                    }}
-                  ></i>
-                </div>
-              </div>
-            ))}
+                    <div className="col-1">
+                      <i
+                        className="fa-solid fa-xmark fa-icon text-danger ms-3 pointer"
+                        onClick={() => {
+                          const updatedItemsArray = [...itemsArray];
+                          updatedItemsArray.splice(index, 1);
+                          setItemsArray(updatedItemsArray);
+                        }}
+                      ></i>
+                    </div>
+                  </div>
+                </>
+              );
+            })}
           </div>
-          <div className="mb-3 rounded-2 ">
-            <h6 className="text-muted  font-14">
-              Brand
-            </h6>
-            <CreatableSelect
-              isClearable
-              isDisabled={isLoading}
-              isLoading={isLoading}
-              onChange={(newValue) => setSelectedBrand(newValue)}
-              onCreateOption={handleCreate}
-              options={options}
-              value={selectedBrand}
-            />
-          </div>
+
           <div className="mb-3 rounded-2 ">
             <h6 className="pb-3 text-muted mid_font border-bottom font-14">
               Product Specification
             </h6>
-
             <div className="d-flex flex-column gap-3 mt-3  ">
-              <div className="d-flex gap-3">
+            <div className="d-flex gap-3">
                 <label className="form-label addempfont w-50">Name</label>
                 <label className="form-label addempfont w-50">Value</label>
-              </div>
+            </div>
               {inputFields.map((inputField, index) => (
                 <div className="d-flex gap-3" key={`${inputField}-${index}`}>
                   <input
@@ -588,16 +592,16 @@ const AddProduct = () => {
                   />
                 </div>
               ))}
-              <div className="text-end">
-                <button
-                  onClick={handleAddFields}
-                  className="btn_blue w-25 me-3"
-                >+</button>
-                <button
-                  onClick={handleRemoveFields}
-                  className="btn_danger w-25"
-                >-</button>
-              </div>
+            <div className="text-end">
+            <button
+                onClick={handleAddFields}
+                className="btn_blue w-25 me-3"
+              >+</button>
+            <button
+                onClick={handleRemoveFields}
+                className="btn_danger w-25"
+              >-</button>
+            </div>
             </div>
           </div>
 

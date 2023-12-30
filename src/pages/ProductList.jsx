@@ -72,7 +72,7 @@ const ProductList = () => {
       width: "10%",
       cell: (row) => (
         <>
-          <Link to={`/product-list/${row.product_id}`}>
+          <Link to={`/product/${row.product_id}`}>
             <i className="fa-solid fa-eye fa-icon me-2 text-warning"></i>
           </Link>
           <button

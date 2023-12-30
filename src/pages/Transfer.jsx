@@ -67,10 +67,18 @@ const Transfer = () => {
   const [data, setData] = useState([]);
   const [transferTo, setTransferTo] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
+  console.log(selectedProducts)
   const [date, setDate] = useState("");
   const [storeList, setStoreList] = useState([]);
   const [searchedProducts, setSearchedProducts] = useState([]);
 
+  console.log(storeList)
+
+  // filter store where store_id ends with 001
+
+  const motherStoreId001 = storeList?.filter((item) => item.store_id.endsWith("001"))[0];
+
+  console.log(motherStoreId001)
 
   const [selectedProductName, setSelectedProductName] = useState("");
   const [price, setPrice] = useState("");
@@ -168,7 +176,7 @@ const Transfer = () => {
     //   }
     // }
     const data = new FormData();
-    data.append("store_from", "motherStoreId001");
+    data.append("store_from", motherStoreId001.store_id);
     data.append("store_to", transferTo);
     data.append("selectedProducts", JSON.stringify(selectedProducts));
     data.append("date", date);
@@ -258,7 +266,8 @@ const Transfer = () => {
                               <option selected disabled value="">
                                 Select Store
                               </option>
-                              {storeList?.map((item) => (
+                              {storeList?.filter((item) => item.store_id !== motherStoreId001.store_id)
+                              .map((item) => (
                                 <option
                                   key={item.store_id}
                                   value={item.store_id}
@@ -337,7 +346,7 @@ const Transfer = () => {
                               Selected Products
                             </label>
                             {
-                              selectedProducts?.map((item, i) => (
+                              selectedProducts?.map((item) => (
                                 <div key={item.product_id} className="row">
                                   <div className="col-lg-4 mb-2">
                                     <input
@@ -347,10 +356,10 @@ const Transfer = () => {
                                       disabled
                                     />
                                   </div>
-                                  <div className="col-lg-4 pt-2">
+                                  <div className="col-lg-4 pt-2 font-10">
                                     {
-                                      item?.attributeIds.map((id, i) => (
-                                        <p className="d-inline bg-success p-2 rounded-2 me-2">{id}</p>
+                                      item?.attributes.map((attribute) => (
+                                        <p className="d-inline border bg-light2 p-2 rounded-2 me-2">{attribute.name}: {attribute.value}</p>
                                       ))
                                     }
 
@@ -388,7 +397,8 @@ const Transfer = () => {
                           </div>
 
                         </div>
-                        <div className="row">
+
+                        {/* <div className="row">
                           <div className="col-lg-8 mb-2">
                             <label
                               htmlFor="message-text"
@@ -445,7 +455,7 @@ const Transfer = () => {
                             ))
                           }
 
-                        </div>
+                        </div> */}
 
                         <div className="col-lg-6 ">
                           <label

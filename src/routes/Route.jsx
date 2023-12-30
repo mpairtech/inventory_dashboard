@@ -17,6 +17,7 @@ import Activities from "../pages/Activities";
 import AddProduct from "../pages/AddProduct";
 import AddStore from "../pages/AddStore";
 import Pos from "../pages/Pos";
+import ProductView from "../pages/ProductView";
 
 
 const router = createBrowserRouter([
@@ -61,6 +62,12 @@ const router = createBrowserRouter([
                 path: "/product-list",
                 element: (
                     <ProductList />
+                ),
+            },
+            {
+                path: "/product/:id",
+                element: (
+                    <ProductView />
                 ),
             },
             {

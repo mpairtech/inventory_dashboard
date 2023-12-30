@@ -8,7 +8,7 @@ const Store = () => {
   const getAllStore = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
-    fetch(`${import.meta.env.VITE_SERVER}/authority/getAllStoreForOrg`, {
+    fetch(`${import.meta.env.VITE_SERVER}/authority/getAllGeneralStoreForOrg`, {
       method: "POST",
       body: data,
     })
