@@ -18,6 +18,8 @@ import AddProduct from "../pages/AddProduct";
 import AddStore from "../pages/AddStore";
 import Pos from "../pages/Pos";
 import ProductView from "../pages/ProductView";
+import Suppliers from "../pages/Suppliers";
+import SupplierView from "../pages/SupplierView";
 
 
 const router = createBrowserRouter([
@@ -99,6 +101,18 @@ const router = createBrowserRouter([
                 path: "/reports",
                 element: (
                     <Reports />
+                ),
+            },
+            {
+                path: "/suppliers",
+                element: (
+                    <Suppliers />
+                ),
+            },
+            {
+                path: "/supplier/:id",
+                element: (
+                    <SupplierView />
                 ),
             },
             {

@@ -132,6 +132,18 @@ const Navbar = () => {
             </NavLink>
 
             <NavLink
+              to="/suppliers"
+              className={({ isActive }) =>
+                `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
+                }`
+              }
+            >
+              <div className="d-flex align-items-center">
+                <img src="/boxes.png" className="nav-img-icon me-2" />
+                <p className="mb-0 me-2 ms-1">Supplier</p>
+              </div>
+            </NavLink>
+            <NavLink
               to="/activities"
               className={({ isActive }) =>
                 `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
