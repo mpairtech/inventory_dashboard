@@ -52,7 +52,7 @@ const TopBar = () => {
                   <div className="row p-2 shadow-none">
                     <div className="col-lg-12 px-0 bg-white shadow-none">
                       <p className="p-2 mb-1 font-14 fw-600">
-                      {userInfo?.name}
+                        {userInfo?.name}
                         <br />
                         {/* <span className="font-10 fw-300"> </span> */}
                       </p>
@@ -70,6 +70,15 @@ const TopBar = () => {
                               </Link>
                             </div> : <></>
                         }
+
+                        <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
+                          <Link to="/activities" className="ms-auto">
+                            <div className=" text-dark  ">
+                              <i className="fa-solid fa-chart-line me-2 fa-lg"></i>
+                              Activities
+                            </div>
+                          </Link>
+                        </div>
 
 
                         <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">

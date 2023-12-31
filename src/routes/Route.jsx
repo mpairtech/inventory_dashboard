@@ -20,6 +20,7 @@ import Pos from "../pages/Pos";
 import ProductView from "../pages/ProductView";
 import Suppliers from "../pages/Suppliers";
 import SupplierView from "../pages/SupplierView";
+import Billing from "../pages/Billing";
 
 
 const router = createBrowserRouter([
@@ -113,6 +114,12 @@ const router = createBrowserRouter([
                 path: "/supplier/:id",
                 element: (
                     <SupplierView />
+                ),
+            },
+            {
+                path: "/billing",
+                element: (
+                    <Billing />
                 ),
             },
             {

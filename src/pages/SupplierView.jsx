@@ -306,12 +306,6 @@ const SupplierView = () => {
                           className={`w-100 ${activeTab === "transaction" ? "btn_active3" : "btn_inactive3"}`}>
                           Transaction
                         </button>
-                        <button
-                          onClick={() => setActiveTab("bill")}
-                          className={`w-100 ${activeTab === "bill" ? "btn_active3" : "btn_inactive3"}`}>
-                          Bill
-                        </button>
-
                       </div>
 
                       {activeTab === "report" && (

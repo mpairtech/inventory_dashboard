@@ -9,21 +9,13 @@ const AddProduct = () => {
   const { userInfo } = useAuth();
 
   const navigate = useNavigate();
+
   const [load, setLoad] = useState(false);
-
   const [productId, setProductId] = useState("");
-
   const [productName, setProductName] = useState("");
-
   const [selectedCategory, setSelectedCategory] = useState(null);
-
-  const [attributes, setAttributes] = useState([]);
-  // const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-
-  const [index, setIndex] = useState(1);
-
   const [images, setImages] = useState([null, null, null, null]);
 
   const [mainCategoryList, setMainCategoryList] = useState([]);
@@ -31,9 +23,7 @@ const AddProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
-  console.log(selectedBrand, "selectedBrand")
   const [brandList, setBrandList] = useState([]);
-  console.log(brandList, "brandList")
 
   const getAllBrands = () => {
     const data = new FormData();
@@ -90,8 +80,6 @@ const AddProduct = () => {
       .catch((err) => console.error(err.message));
   };
 
-
-
   const getAllCategories = () => {
     const data = new FormData();
     data.append("org_id", userInfo?.organizationData?.org_id);
@@ -115,8 +103,6 @@ const AddProduct = () => {
 
   console.log(variantList, "variantList")
 
-  // console.log(selectedAttributes, "selectedAttributes")
-
   const addVariant = (e) => {
     e.preventDefault();
 
@@ -130,7 +116,6 @@ const AddProduct = () => {
     setQuantity('');
     setSelectedAttributes({});
   };
-
 
   const [attributeList, setAttributeList] = useState([]);
 
@@ -152,8 +137,6 @@ const AddProduct = () => {
     getAllAttributes();
     getAllBrands();
   }, []);
-
-
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -193,8 +176,6 @@ const AddProduct = () => {
 
   };
 
-
-
   useEffect(() => {
     getLastProductId();
     getAllCategories();
@@ -231,9 +212,7 @@ const AddProduct = () => {
   const renderNestedCategories = (categories, depth = 1) => {
     return categories.map((category) => (
       <>
-        <option key={category.category_id} value={JSON.stringify(category)}
-
-        >
+        <option key={category.category_id} value={JSON.stringify(category)}>
           {'━'.repeat(depth)} {category.name}
         </option>
         {category.subcategories && category.subcategories.length > 0 &&
