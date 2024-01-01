@@ -240,6 +240,175 @@ const Accounts = () => {
                 </div>
                 <div className="card-body min-vh-70 row">
 
+                <>
+  <div className="single-accordion">
+    <div className="accordion-style-one">
+      <div className="accordion" id="accordion">
+        <div className="card">
+          <div className="card-header" id="headingOne">
+            <a
+              href="#collapseOne"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="true"
+            >
+              Accordions title here
+            </a>
+          </div>
+          <div
+            id="collapseOne"
+            className="collapse show"
+            data-bs-parent="#accordion"
+          >
+            <div className="card-body">
+              <p className="text">
+                Raw denim you probably haven’t heard of them jean shorts Austin.
+                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
+                Mustache cliche tempor, williamsburg carles vegan helvetica.
+                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
+                <br />
+                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
+                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
+                cardigan american apparel, butcher voluptate nisi qui.
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* card */}
+        <div className="card">
+          <div className="card-header" id="headingTwo">
+            <a
+              className="collapsed"
+              href="#collapseTwo"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="false"
+            >
+              Accordions title here
+            </a>
+          </div>
+          <div
+            id="collapseTwo"
+            className="collapse"
+            data-bs-parent="#accordion"
+          >
+            <div className="card-body">
+              <p className="text">
+                Raw denim you probably haven’t heard of them jean shorts Austin.
+                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
+                Mustache cliche tempor, williamsburg carles vegan helvetica.
+                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
+                <br />
+                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
+                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
+                cardigan american apparel, butcher voluptate nisi qui.
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* card */}
+        <div className="card">
+          <div className="card-header" id="headingThree">
+            <a
+              className="collapsed"
+              href="#collapseThree"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="false"
+            >
+              Accordions title here
+            </a>
+          </div>
+          <div
+            id="collapseThree"
+            className="collapse"
+            data-bs-parent="#accordion"
+          >
+            <div className="card-body">
+              <p className="text">
+                Raw denim you probably haven’t heard of them jean shorts Austin.
+                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
+                Mustache cliche tempor, williamsburg carles vegan helvetica.
+                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
+                <br />
+                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
+                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
+                cardigan american apparel, butcher voluptate nisi qui.
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* card */}
+        <div className="card">
+          <div className="card-header" id="headingFour">
+            <a
+              className="collapsed"
+              href="#collapseFour"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="false"
+            >
+              Accordions title here
+            </a>
+          </div>
+          <div
+            id="collapseFour"
+            className="collapse"
+            data-bs-parent="#accordion"
+          >
+            <div className="card-body">
+              <p className="text">
+                Raw denim you probably haven’t heard of them jean shorts Austin.
+                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
+                Mustache cliche tempor, williamsburg carles vegan helvetica.
+                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
+                <br />
+                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
+                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
+                cardigan american apparel, butcher voluptate nisi qui.
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* card */}
+        <div className="card">
+          <div className="card-header" id="headingFive">
+            <a
+              className="collapsed"
+              href="#collapseFive"
+              data-bs-toggle="collapse"
+              role="button"
+              aria-expanded="false"
+            >
+              Accordions title here
+            </a>
+          </div>
+          <div
+            id="collapseFive"
+            className="collapse"
+            data-bs-parent="#accordion"
+          >
+            <div className="card-body">
+              <p className="text">
+                Raw denim you probably haven’t heard of them jean shorts Austin.
+                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
+                Mustache cliche tempor, williamsburg carles vegan helvetica.
+                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
+                <br />
+                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
+                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
+                cardigan american apparel, butcher voluptate nisi qui.
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* card */}
+      </div>
+    </div>
+    {/* card */}
+  </div>
+  {/* accordion style one */}
+</>
 
 
                 </div>
