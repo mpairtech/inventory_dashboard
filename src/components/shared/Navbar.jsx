@@ -119,19 +119,6 @@ const Navbar = () => {
             </NavLink>
 
             <NavLink
-              to="/reports"
-              className={({ isActive }) =>
-                `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
-                }`
-              }
-            >
-              <div className="d-flex align-items-center">
-                <img src="/chart-histogram.png" className="nav-img-icon me-2" />
-                <p className="mb-0 me-2 ms-1">Report</p>
-              </div>
-            </NavLink>
-
-            <NavLink
               to="/suppliers"
               className={({ isActive }) =>
                 `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
@@ -156,7 +143,19 @@ const Navbar = () => {
                 <p className="mb-0 me-2 ms-1">Billing</p>
               </div>
             </NavLink>
-  
+
+            <NavLink
+              to="/reports"
+              className={({ isActive }) =>
+                `font-16 ${isActive ? "active_nav px-4" : "inactive_nav px-4"
+                }`
+              }
+            >
+              <div className="d-flex align-items-center">
+                <img src="/chart-histogram.png" className="nav-img-icon me-2" />
+                <p className="mb-0 me-2 ms-1">Report</p>
+              </div>
+            </NavLink>
 
           </nav>
         </div>

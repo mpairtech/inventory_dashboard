@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
+import { formatDate } from '../../utils/utils';
 
 const CustomizeOrg = () => {
 
     //! ORGANIZATION
-    const {userInfo} = useAuth();
+    const { userInfo } = useAuth();
+    console.log(userInfo)
+
     const [update, setUpdate] = useState(0);
 
     const [orgName, setOrgName] = useState("");
@@ -239,7 +242,7 @@ const CustomizeOrg = () => {
                                 <td>
                                     <div className="logobox text-start position-relative ">
                                         <img
-                                            src="/logo.png"
+                                            src={`${import.meta.env.VITE_IMG}${userInfo?.organizationData?.logo}`}
                                             alt=""
                                             className="logo_icon2  my-2"
                                         />
@@ -266,7 +269,7 @@ const CustomizeOrg = () => {
 
                                 <td>
                                     <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
-                                        Nokshikatha
+                                        {userInfo?.organizationData?.name}
                                     </p>
                                 </td>
                             </tr>
@@ -279,7 +282,7 @@ const CustomizeOrg = () => {
                                 <td>
                                     <div>
                                         <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
-                                            34 WASA, CTG
+                                            {userInfo?.organizationData?.location}
                                         </p>
                                     </div>
                                 </td>
@@ -288,13 +291,13 @@ const CustomizeOrg = () => {
                             <tr>
                                 <td>
                                     <p className="mb-0 ms-2 align-middle py-2 font-14 fw-600 text-muted">
-                                        Authorized Person
+                                        Owner Name
                                     </p>
                                 </td>
                                 <td>
                                     <div>
                                         <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
-                                            Mainul bhai
+                                            {userInfo?.organizationData?.owner_name}
                                         </p>
                                     </div>
                                 </td>
@@ -302,13 +305,13 @@ const CustomizeOrg = () => {
                             <tr>
                                 <td>
                                     <p className="mb-0 ms-2 align-middle py-2 font-14 fw-600 text-muted">
-                                        Designation
+                                        Contact Number
                                     </p>
                                 </td>
                                 <td>
                                     <div>
                                         <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
-                                            Ostad
+                                            {userInfo?.organizationData?.number}
                                         </p>
                                     </div>
                                 </td>
@@ -323,7 +326,7 @@ const CustomizeOrg = () => {
                                 <td>
                                     <div>
                                         <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
-                                            saddam23@gmail.com
+                                            {userInfo?.organizationData?.email}
                                         </p>
                                     </div>
                                 </td>
@@ -331,27 +334,33 @@ const CustomizeOrg = () => {
                             <tr>
                                 <td>
                                     <p className="mb-0 ms-2 align-middle py-2 font-14 fw-600 text-muted">
-                                        Organization Phone
+                                        Organization Type
                                     </p>
                                 </td>
                                 <td>
                                     <div>
                                         <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
-                                            0182343535
+                                            {userInfo?.organizationData?.type}   ({userInfo?.organizationData?.isMulti === "YES" ? "Multi Store" : "Single Store"})
                                         </p>
                                     </div>
                                 </td>
                             </tr>
+
                             <tr>
                                 <td>
                                     <p className="mb-0 ms-2 align-middle py-2 font-14 fw-600 text-muted">
-                                        Password
+                                        Created Date
                                     </p>
                                 </td>
                                 <td>
-                                    <p className="font-6 m-0 mt-1">********</p>
+                                    <div>
+                                        <p className="mb-0 align-middle py-2 text-muted fw-600 font-14">
+                                            {formatDate(userInfo?.organizationData?.date?.$date)}
+                                        </p>
+                                    </div>
                                 </td>
                             </tr>
+
                         </tbody>
                     </table>
                 </div>

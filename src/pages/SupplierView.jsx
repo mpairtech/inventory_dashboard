@@ -492,100 +492,62 @@ const SupplierView = () => {
                         <div className="mt-3 mx-3">
                           <div className="row">
                             <form onSubmit={{}} className="col-lg-12 ">
-                              <div className="">
-                                <p
-                                  className=""
-                                >
+                              <div className="d-flex justify-content-between align-items-center ">
+                                <p className="fw-500">
                                   Add New Transaction
                                 </p>
+                                <p><span className="fw-500">Due Amount: </span><span>5000 BDT</span></p>
                               </div>
-                                <div
-                                  className="col-lg-12 "
-                                >
-                                  <div className="row">
-                                    <div className=" col-lg-6">
-                                      <label
-                                        htmlFor="recipient-name"
-                                        className="col-form-label text-muted "
-                                      >
-                                        Supplier Name
-                                      </label>
-                                      <input
-                                        type="text"
-                                        className="form-control font-13 shadow-none bg-white"
-                                        onChange={(e) => setSupplierName(e.target.value)}
-                                      />
-                                    </div>
-                                    <div className="col-lg-6">
-                                      <label
-                                        htmlFor="recipient-name"
-                                        className="col-form-label text-muted "
-                                      >
-                                        Supplier Type
-                                      </label>
-                                      <select
-                                        className="form-control font-13 shadow-none"
-                                        onChange={(e) => setSupplierType(e.target.value)}
-                                      >
-                                        <option selected disabled value="">
-                                          Select Supplier Type
-                                        </option>
-                                        <option value="test">
-                                          test
-                                        </option>
-                                      </select>
-                                    </div>
+                              <div className="col-lg-12 ">
+                                <div className="row">
+                                  <div className=" col-lg-6">
+                                    <label
+                                      htmlFor="recipient-name"
+                                      className="col-form-label text-muted "
+                                    >
+                                      Payment Date
+                                    </label>
+                                    <input
+                                      type="date"
+                                      className="form-control font-13 shadow-none bg-white"
+                                      onChange={(e) => setDate(e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <label
+                                      htmlFor="recipient-name"
+                                      className="col-form-label text-muted "
+                                    >
+                                      Supplier
+                                    </label>
+                                    <select
+                                      className="form-control font-13 shadow-none"
+                                      onChange={(e) => setSupplierType(e.target.value)}
+                                    >
+                                      <option selected disabled value="">
+                                        Select Supplier Type
+                                      </option>
+                                      <option value="test">
+                                        test
+                                      </option>
+                                    </select>
+                                  </div>
 
-                                    <div className="col-lg-6">
-                                      <label
-                                        className="col-form-label text-muted "
-                                      >
-                                        Contact Person
-                                      </label>
-                                      <input
-                                        className="form-control font-13 shadow-none bg-white"
-                                        onChange={(e) => setContactPerson(e.target.value)}
-                                      />
-                                    </div>
-
-                                    <div className="col-lg-6">
-                                      <label
-                                        className="col-form-label text-muted"
-                                      >
-                                        Contact Number
-                                      </label>
-                                      <input
-                                        className="form-control font-13 shadow-none bg-white"
-                                        onChange={(e) => setContactNumber(e.target.value)}
-                                      />
-                                    </div>
-                                    <div className=" col-lg-6">
-                                      <label
-                                        htmlFor="message-text"
-                                        className="col-form-label text-muted "
-                                      >
-                                        Location
-                                      </label>
-                                      <input
-                                        className="form-control font-13 shadow-none bg-white"
-                                        onChange={(e) => setLocation(e.target.value)}
-                                      />
-                                    </div>
-                                    <div className="col-lg-6">
-                                      <label
-                                        htmlFor="message-text"
-                                        className="col-form-label text-muted "
-                                      >
-                                        Opening Balance
-                                      </label>
-                                      <input
-                                        type="number"
-                                        className="form-control font-13 shadow-none bg-white"
-                                        onChange={(e) => setOpBalance(e.target.value)}
-                                      />
-                                    </div>
+                                  <div className="col-lg-6">
+                                    <label
+                                      htmlFor="message-text"
+                                      className="col-form-label text-muted "
+                                    >
+                                      Paid Amount
+                                    </label>
+                                    <input
+                                      type="number"
+                                      className="form-control font-13 shadow-none bg-white"
+                                      onChange={(e) => setOpBalance(e.target.value)}
+                                    />
                                   </div>
                                 </div>
+                              </div>
                               <div className="modal-footer">
                                 <button
                                   type="submit"

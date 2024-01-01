@@ -233,7 +233,7 @@ const ProductList = () => {
                     type="text"
                     className="border  shadow-none  pos-input w-75"
                   />
-                  <button className="btn_small serach-magnify px-3 border-0 rounded-0 rounded-end">
+                  <button className="btn_small  px-2 border-0 rounded-0 rounded-end">
                     <i className="fa-solid fa-magnifying-glass fa-lg"></i>
                   </button>
                 </div>
@@ -241,7 +241,6 @@ const ProductList = () => {
                   <Link to="/add-product" className="">
                     <button className="btn_primary w-100 text-white">
                       Add New Product
-
                     </button>
                   </Link>
                 </div>

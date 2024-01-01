@@ -21,6 +21,7 @@ import ProductView from "../pages/ProductView";
 import Suppliers from "../pages/Suppliers";
 import SupplierView from "../pages/SupplierView";
 import Billing from "../pages/Billing";
+import Customers from "../pages/Customers";
 
 
 const router = createBrowserRouter([
@@ -90,6 +91,12 @@ const router = createBrowserRouter([
                 path: "/expenses",
                 element: (
                     <Expenses />
+                ),
+            },
+            {
+                path: "/customers",
+                element: (
+                    <Customers />
                 ),
             },
             {
