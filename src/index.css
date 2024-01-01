@@ -748,3 +748,8 @@ color: #777;
 padding: 10px 15px;
 box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+
+.modal-content {
+  border: none !important;
+  border-radius: 3px !important;
+}

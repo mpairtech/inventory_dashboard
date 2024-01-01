@@ -107,6 +107,10 @@ const AddProduct = () => {
   const addVariant = (e) => {
     e.preventDefault();
 
+    if(!Object.keys(selectedAttributes).length) {
+      return toast.error("Please select at least one attribute");
+    }
+
     const newVariant = Object.keys(selectedAttributes).map((attributeName) => ({
       name: attributeName,
       value: selectedAttributes[attributeName],

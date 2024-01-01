@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import DataTable, { createTheme } from "react-data-table-component";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { UserInfoContext } from "../providers/AuthProvider";
+import { useAuth } from "../providers/AuthProvider";
 
 createTheme({
   background: {
@@ -23,39 +23,29 @@ const customStyles = {
 
 const Expenses = () => {
   const columns = [
+  
     {
-      name: "Expense ID",
-      selector: (row) => row.expense_id,
-      sortable: true,
-      minWidth: false,
-      center: true,
-    },
-    {
-      name: "Create Date",
-      selector: (row) => row.cdate,
+      name: "Expense Head",
+      selector: (row) => row?.expense_head,
       sortable: true,
       minWidth: false,
     },
     {
       name: "Expense By",
-      selector: (row) => row.expense_by,
+      selector: (row) => row?.expense_by,
       sortable: true,
       minWidth: false,
-    },
-    {
-      name: "Expense Head",
-      selector: (row) => row.expense_head,
-      sortable: true,
-      minWidth: false,
-    },
-    {
-      name: "Expense Description",
-      selector: (row) => row.des,
-      sortable: true,
     },
     {
       name: "Expense Amount",
-      selector: (row) => row.expense_amount,
+      selector: (row) => row?.amount,
+      sortable: true,
+      minWidth: false,
+    },
+
+    {
+      name: "Expense Description",
+      selector: (row) => row?.des,
       sortable: true,
     },
     {
@@ -119,28 +109,23 @@ const Expenses = () => {
       ),
     },
   ];
-  const { userInfo } = useContext(UserInfoContext);
+  const { userInfo } = useAuth();
   const [update, setUpdate] = useState(0);
   const [data, setData] = useState([]);
   const [storeList, setStoreList] = useState([]);
+  console.log(storeList)
   const [selectedStore, setSelectedStore] = useState(null);
 
   const getAllExpenses = () => {
     const data = new FormData();
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getAllExpenses`, {
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/expense/getExpensesForOrg`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        if (selectedStore) {
-          const storeData = res.message.filter((item) => {
-            return item.store_id == selectedStore;
-          });
-          setData(storeData);
-        } else {
-          setData(res.message);
-        }
+        setData(res);
       })
       .catch((err) => console.log(err));
   };
@@ -162,14 +147,14 @@ const Expenses = () => {
 
   const getDropDownStore = () => {
     const data = new FormData();
-    // data.append("store_id", userInfo.store_id);
-    fetch(`${import.meta.env.VITE_SERVER}/admin/getAllStore`, {
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/authority/getAllStoreForOrg`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
-        setStoreList(res.message);
+        setStoreList(res);
       })
       .catch((err) => console.log(err));
   };
@@ -178,6 +163,45 @@ const Expenses = () => {
     getAllExpenses();
     getDropDownStore()
   }, [update, selectedStore]);
+
+  const [store, setStore] = useState(null);
+  const [expenseHead, setExpenseHead] = useState(null);
+  const [expenseBy, setExpenseBy] = useState(null);
+  const [amount, setAmount] = useState(null);
+  const [date, setDate] = useState(null);
+  const [description, setDescription] = useState(null);
+
+  const addExpense = (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    data.append("store_id",  store);
+    data.append("user_id",  userInfo?.user_id);
+    data.append("expense_by",  expenseBy);
+    data.append("expense_head",  expenseHead);
+    data.append("amount",  amount);
+    data.append("des",  description);
+    data.append("date",  date);
+    fetch(`${import.meta.env.VITE_SERVER}/expense/addExpense`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        if (res?.expense_id) {
+          toast.success("Expense added successfully");
+          setUpdate(!update);
+        } else {
+          toast.error("Failed to Add Expense");
+        }
+      })
+      .catch((err) => {
+        toast.error("An error occurred while adding Expense");
+      });
+  }
+
+
   return (
     <div className="container-fluid  ">
       <div className="row">
@@ -189,9 +213,166 @@ const Expenses = () => {
             </div>
             <div className="col-lg-8 px-0"></div>
             <div className="col-lg-2 mt-3 ps-4">
-              <Link to="/add-expense" className="btn_primary py-2 ">
-                + Add New Entry
-              </Link>
+              <span
+                className="btn_primary py-2 cursor-pointer"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal2"
+                data-bs-whatever="@mdo"
+              >
+                Add Expense
+              </span>
+              <div
+                className="modal fade"
+                id="exampleModal2"
+                tabIndex={-1}
+                aria-labelledby="exampleModalLabel"
+                aria-hidden="true"
+              >
+                <div className="modal-dialog modal-dialog-centered modal-lg">
+                  <div className="modal-content">
+                    <form onSubmit={addExpense} className="col-lg-12 ">
+                      <div className="modal-header">
+                        <h1
+                          className="modal-title fs-5"
+                          id="exampleModalLabel"
+                        >
+                          Add Expense
+                        </h1>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        />
+                      </div>
+                      <div className="modal-body">
+                        <div
+                          className="col-lg-12 "
+                        >
+                          <div className="row">
+
+                            <div className="my-1 col-lg-6">
+                              <label
+                                htmlFor="recipient-name"
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Store
+                              </label>
+                              <select
+                                className="form-control py-2 font-13 shadow-none"
+                                onChange={(e) => setStore(e.target.value)}
+                              >
+                                <option selected disabled value="">
+                                  Select Store
+                                </option>
+                                {
+                                  storeList?.map((item) => (
+                                    <option
+                                      key={item.store_id}
+                                      value={item.store_id}
+                                    >
+                                      {item.name}
+                                    </option>
+                                  ))
+                                }
+                              </select>
+                            </div>
+                            <div className="my-1 col-lg-6">
+                              <label
+                                htmlFor="recipient-name"
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Expense Head
+                              </label>
+                              <select
+                                className="form-control py-2 font-13 shadow-none"
+                                onChange={(e) => setExpenseHead(e.target.value)}
+                              >
+                                <option selected disabled value="">
+                                  Select Expense Head
+                                </option>
+                                <option value="1">
+                                  1
+                                </option>
+                                <option value="2">
+                                  2
+                                </option>
+                              </select>
+                            </div>
+
+                            <div className="my-1 col-lg-6">
+                              <label
+                                htmlFor="recipient-name"
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Expense By
+                              </label>
+                              <input
+                                type="text"
+                                className="form-control py-2 font-13 shadow-none bg-white"
+                                onChange={(e) => setExpenseBy(e.target.value)}
+                              />
+                            </div>
+
+                            <div className="my-1 col-lg-6">
+                              <label
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Amount
+                              </label>
+                              <input
+                                type="number"
+                                className="form-control py-2 font-13 shadow-none bg-white"
+                                onChange={(e) => setAmount(e.target.value)}
+                              />
+                            </div>
+                            <div className="my-1 col-lg-6">
+                              <label
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Date
+                              </label>
+                              <input
+                                type="date"
+                                className="form-control py-2 font-13 shadow-none bg-white"
+                                onChange={(e) => setDate(e.target.value)}
+                              />
+                            </div>
+
+                            <div className="my-1 col-12">
+                              <label
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Description
+                              </label>
+                              <textarea
+                                className="form-control py-2 font-13 shadow-none bg-white"
+                                onChange={(e) => setDescription(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="modal-footer">
+                        <button
+                          type="button"
+                          className="btn_danger"
+                          data-bs-dismiss="modal"
+                        >
+                          Close
+                        </button>
+                        <button
+                          type="submit"
+                          data-bs-dismiss="modal"
+                          className="btn_primary"
+                        >
+                          Confirm
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -202,7 +383,7 @@ const Expenses = () => {
                   <div className="row mt-2">
 
                   </div>
-                  <div className="col-lg-2 pe-4 ps-0 col-12 my-3 mx-3">
+                  <div className="col-lg-2 pe-4 ps-0 col-12 my-1 mx-3">
                     <select
                       className="form-control py-2 font-13 shadow-none"
                       onChange={(e) => setSelectedStore(e.target.value)}
