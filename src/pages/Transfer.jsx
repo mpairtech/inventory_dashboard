@@ -35,7 +35,7 @@ const Transfer = () => {
     },
     {
       name: "Product Name",
-      selector: (row) => row.name,
+      selector: (row) => row.product_name,
       width: "20%",
     },
 
@@ -120,6 +120,7 @@ const Transfer = () => {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         setData(res);
       })
       .catch((err) => console.log(err));
@@ -289,14 +290,20 @@ const Transfer = () => {
                             Search product
                           </label>
                           <input
-                            className="form-control py-2 font-13 shadow-none bg-white"
-                            id="message-text"
-                            placeholder="Search Product"
-                            onChange={(e) => {
-                              setSearchText(e.target.value);
-                              setShow(true);
-                            }}
-                          />
+                              type="text"
+                              onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setShow(true);
+                              }}
+                              onFocus={
+                                () =>
+                                  setTimeout(() => {
+                                    setShow(true)
+                                  }, 200)
+                              }
+                              placeholder="Search Product"
+                              className="form-control  shadow-none w-85"
+                            />
                         </div>
                         {/* search items */}
 
@@ -306,17 +313,17 @@ const Transfer = () => {
                               position: "absolute",
                               background: "white",
                               width: "90%",
-                              left: "5%",
-                              top: "46%",
+                              left: '25px',
+                              top: 175,
                               padding: 10,
                             }}
-                            className="shadow-lg mb-0 pb-0 bg-white  rounded"
+                            className="shadow-lg mb-0 pb-0  rounded"
                           >
                             {searchedProducts
                               .map((item, index) => (
                                 <div
                                   key={item.product_id}
-                                  className="pb-0 mb-2 ps-2 border-bottom"
+                                  className="pb-0 mb-2 ps-2 hover_effect border "
                                   onClick={() => {
                                     // setSelectedProductName(item.name);
                                     // make array of product_id
@@ -508,7 +515,7 @@ const Transfer = () => {
               <div className="card border min-vh-66">
                 <div className="card-head">
                   <div className="row mt-2">
-                    <div className="col-lg-3 ps-4 ">
+                    <div className="col-lg-3 ps-4 d-flex py-0 my-0 ">
                       <input
                         onChange={(e) => setSearchField(e.target.value)}
                         type="text"

@@ -24,6 +24,7 @@ const AddProduct = () => {
   const [options, setOptions] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [brandList, setBrandList] = useState([]);
+  const [supplier, setSupplier] = useState('');
 
   const getAllBrands = () => {
     const data = new FormData();
@@ -155,6 +156,7 @@ const AddProduct = () => {
     data.append("categoryId", selectedCategory.category_id);
     data.append("user_id", userInfo?.user_id);
     data.append("brand_id", selectedBrand?.value);
+    data.append("supplierId", supplier);
     data.append("variantList", JSON.stringify(variantList));
     data.append("specifications", JSON.stringify(inputFields));
 
@@ -176,14 +178,28 @@ const AddProduct = () => {
 
   };
 
+  const [supplierList, setSupplierList] = useState([]);
+
+  const getAllSuppliers = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/supplier/getSuppliersForOrg`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setSupplierList(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     getLastProductId();
     getAllCategories();
+    getAllSuppliers();
   }, []);
 
-  useEffect(() => {
-    getAllCategories();
-  }, [selectedCategory]);
 
 
   // specification
@@ -527,19 +543,36 @@ const AddProduct = () => {
               </div>
             ))}
           </div>
-          <div className="mb-3 rounded-2 ">
-            <h6 className="text-muted  font-14">
-              Brand
-            </h6>
-            <CreatableSelect
-              isClearable
-              isDisabled={isLoading}
-              isLoading={isLoading}
-              onChange={(newValue) => setSelectedBrand(newValue)}
-              onCreateOption={handleCreate}
-              options={options}
-              value={selectedBrand}
-            />
+          <div className="row">
+            <div className="col-6 mb-3 rounded-2 ">
+              <h6 className="text-muted  font-14">
+                Brand
+              </h6>
+              <CreatableSelect
+                isClearable
+                isDisabled={isLoading}
+                isLoading={isLoading}
+                onChange={(newValue) => setSelectedBrand(newValue)}
+                onCreateOption={handleCreate}
+                options={options}
+                value={selectedBrand}
+              />
+            </div>
+
+            <div className="col-6 mb-3 rounded-2 ">
+              <h6 className="text-muted  font-14">
+                Supplier
+              </h6>
+              <select
+                className="form-control font-13 shadow-none bg-white"
+                onChange={(e) => setSupplier(e.target.value)}
+              >
+                <option disabled selected>Select Supplier</option>
+                {supplierList.map((item) => (
+                  <option value={item.supplier_id}>{item.supplier_name}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="mb-3 rounded-2 ">
             <h6 className="pb-3 text-muted mid_font border-bottom font-14">

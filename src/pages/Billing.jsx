@@ -29,35 +29,30 @@ const Billing = () => {
       sortable: true,
       minWidth: false,
       center: true,
-      width: "50px",
+      width: "10px",
     },
     {
       name: "Supplier Name",
-      selector: (row) => row.supplier_name,
+      selector: (row) => row.supplier.supplier_name,
       sortable: true,
       minWidth: false,
     },
     {
-      name: "Supplier Type",
-      selector: (row) => row.supplier_type,
+      name: "Bill No",
+      selector: (row) => row.bill_no,
       sortable: true,
       minWidth: false,
     },
 
     {
-      name: "Contact Number",
-      selector: (row) => row.contact_number,
+      name: "Bill_amount",
+      selector: (row) => row.bill_amount,
       sortable: true,
     },
 
-    {
-      name: "Out Balance",
-      selector: (row) => row.op_balance,
-      sortable: true,
-    },
     {
       name: "Create Date",
-      selector: (row) => formatDate(row.createdAt),
+      selector: (row) => formatDate(row.date),
       sortable: true,
       minWidth: false,
     },
@@ -150,8 +145,6 @@ const Billing = () => {
   const getAllSupplierBills = () => {
     const data = new FormData();
     data.append("org_id", userInfo.organizationData.org_id);
-    data.append("org_id", userInfo.organizationData.org_id);
-
     fetch(`${import.meta.env.VITE_SERVER}/supplier/getAllSupplierBillsForOrg`, {
       method: "POST",
       body: data,
@@ -1091,7 +1084,7 @@ const Billing = () => {
                     <div className="col-lg-12">
                       <DataTable
                         columns={columns}
-                        data={supplierList}
+                        data={supplierBillList}
                         customStyles={customStyles}
                         noHeader={true}
                         pagination
