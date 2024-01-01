@@ -72,8 +72,16 @@ const TopBar = () => {
                         }
 
                         <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
+                          <Link to="/accounts" className="ms-auto">
+                            <div className="text-dark  ">
+                              <i className="fa-solid fa-dollar me-2 fa-lg text-secondary-emphasis "></i>
+                              Accounts
+                            </div>
+                          </Link>
+                        </div>
+                        <div className="my-1 p-2 font-12 text-muted border-bottom cursor-pointer">
                           <Link to="/customers" className="ms-auto">
-                            <div className=" text-dark  ">
+                            <div className="text-dark  ">
                               <i className="fa-solid fa-user me-2 fa-lg text-secondary-emphasis "></i>
                               Customers
                             </div>
