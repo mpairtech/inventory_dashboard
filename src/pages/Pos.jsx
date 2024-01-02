@@ -53,17 +53,43 @@ const Pos = () => {
   const [dis, setDis] = useState(0);
   const [ultDiscountAmount, setUltDiscountAmount] = useState(0);
   const [cashMode, setCashMode] = useState("active");
-  const [cardMode, setCardMode] = useState("inactive");
+  const [bankMode, setBankMode] = useState("inactive");
   const [otherMode, setOtherMode] = useState("inactive");
-  const [bankCardType, setBankCardType] = useState("");
-  const [otherType, setOtherType] = useState("");
+  const [bankAcc, setBankAcc] = useState("");
+  console.log(bankAcc)
+  const [bankAccCardType, setBankAccCardType] = useState("");
+  const [otherAcc, setOtherAcc] = useState("");
+  console.log(otherAcc)
   const [soldBy, setSoldBy] = useState("");
   const [referredBy, setReferredBy] = useState("");
 
   const [invoiceData, setInvoiceData] = useState({});
 
 
+  const [cashAccList, setCashAccList] = useState([]);
+  const [bankAccList, setBankAccList] = useState([]);
+  const [otherAccList, setOtherAccList] = useState([]);
+  console.log(cashAccList, bankAccList, otherAccList)
+  const getAllAccounts = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/account/getAccountsForOrg`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setCashAccList(res.filter((item) => item.accountType === "CASH"));
+        setBankAccList(res.filter((item) => item.accountType === "BANK"));
+        setOtherAccList(res.filter((item) => item.accountType === "OTHER"));
+      })
+      .catch((err) => console.log(err));
+  };
 
+  useEffect(() => {
+    getAllAccounts();
+  }, []);
 
   const getLastProductId = () => {
     fetch(`${import.meta.env.VITE_SERVER}/getLastAddedCustomer`, {
@@ -187,7 +213,7 @@ const Pos = () => {
       setRefTotal(parseFloat(myRef.current.innerText));
       setUltDiscountAmount(total - (total - total * (dis / 100)));
     }
-  }, [dis, fixedDiscount, updateCount, items , cardAmount, cashAmount, otherAmount]);
+  }, [dis, fixedDiscount, updateCount, items, cardAmount, cashAmount, otherAmount]);
 
 
   useEffect(() => {
@@ -318,10 +344,11 @@ const Pos = () => {
       );
       data.append("total_payable", refTotal);
       data.append("payment_mode_cash", cashMode);
-      data.append("payment_mode_card", cardMode);
+      data.append("payment_mode_card", bankMode);
       data.append("payment_mode_other", otherMode);
-      data.append("bc_type", bankCardType);
-      data.append("o_type", otherType);
+      data.append("bankAcc", bankAcc);
+      data.append("bankAccCardType", bankAccCardType);
+      data.append("otherAcc", otherAcc);
       data.append("cash_paid", cashAmount);
       data.append("bank_paid", cardAmount);
       data.append("other_paid", otherAmount);
@@ -477,7 +504,7 @@ const Pos = () => {
       .then((res) => res.json())
       .then((res) => {
         console.log(res)
-        if(activeCategory === 0){
+        if (activeCategory === 0) {
           setData(searchedProducts)
         } else {
           setData(res)
@@ -501,7 +528,7 @@ const Pos = () => {
         <div className="row">
           {
             activeDiv === "pos" ?
-              <div className="col-lg-8 mt-3 " style={{ position: "relative" }}>
+              <div className="col-lg-7 mt-3 " style={{ position: "relative" }}>
                 {items?.map((item, index) => {
                   return (
                     <div key={
@@ -522,7 +549,7 @@ const Pos = () => {
                           <div className="w-50">
                             {" "}
                             <p className="font-14 fw-semibold mb-1">
-                              {item.name} 
+                              {item.name}
                               {/* <span className="text-info">({(item.attributeIds)
                                 .map((item) => {
                                   return item;
@@ -585,7 +612,7 @@ const Pos = () => {
                   );
                 })}
               </div> :
-              <div className="col-lg-8 mt-3" style={{ position: "relative" }}>
+              <div className="col-lg-7 mt-3" style={{ position: "relative" }}>
                 <div className="p-3">
                   <div className='d-flex align-content-center '>
                     <p className="mt-1 me-2 cursor-pointer" onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left fs-4"></i></p>
@@ -699,7 +726,7 @@ const Pos = () => {
           }
 
 
-          <div className="col-lg-4">
+          <div className="col-lg-5">
             {
               activeDiv === "cart" &&
               <div className="py-3" style={{ height: "100vh" }}>
@@ -803,7 +830,7 @@ const Pos = () => {
                                   <div className="w-50">
                                     {" "}
                                     <p className="font-14 fw-semibold mb-1">
-                                      {item.name} 
+                                      {item.name}
                                       {/* <span className="text-info">({(item.attributeIds)
                                         .map((item) => {
                                           return item;
@@ -870,13 +897,11 @@ const Pos = () => {
                       </div>
                       <div className="w-50 m-0">
                         <button
-                          onClick={() => 
-
-                            {
-                              items.length === 0 ? toast.error("Please add some items !") :
+                          onClick={() => {
+                            items.length === 0 ? toast.error("Please add some items !") :
                               setActiveDiv(activeDiv === "cart" ? "pos" : "cart")
-                            }
-                          
+                          }
+
                           }
                           className="btn_primary border-0 text-white font-16 rounded-1 w-100"
                         >
@@ -1259,8 +1284,8 @@ const Pos = () => {
                       )}
                     </div>
                     <hr className="" />
-                    <div className="col-lg-12 d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex justify-content-start align-items-center ">
+                    <div className="row mb-2">
+                      <div className="col-3">
                         <input
                           checked={cashMode === "active" ? true : false}
                           onChange={(e) =>
@@ -1275,94 +1300,116 @@ const Pos = () => {
                           Cash
                         </span>
                       </div>
-                      <input
-                        value={cashAmount}
-                        onChange={(e) => setCashAmount(e.target.value)}
-                        disabled={cashMode === "active" ? false : true}
-                        className="w-35 form-control font-14 py-1 rounded-1 shadow-none text-end"
-                        type="number"
-                      />
+                      <div className="col-5"></div>
+                      <div className="col-4">
+                        <input
+                          value={cashAmount}
+                          onChange={(e) => setCashAmount(e.target.value)}
+                          disabled={cashMode === "active" ? false : true}
+                          className="form-control font-14 py-1 rounded-1 shadow-none"
+                          type="number"
+                        />
+                      </div>
                     </div>
-                    <div className="col-lg-12 d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex justify-content-start align-items-center ms-2">
+                    <div className="row mb-2">
+                      <div className="col-3">
                         <input
                           onChange={(e) =>
-                            setCardMode(
-                              `${cardMode === "active" ? "inactive" : "active"}`
+                            setBankMode(
+                              `${bankMode === "active" ? "inactive" : "active"}`
                             )
                           }
-                          className="form-check-input mb-1 shadow-none "
+                          className="form-check-input mb-1 ms-2  shadow-none "
                           type="checkbox"
                         />
-                        <span className="font-17 text-nowrap fw-bold ms-3">
-                          Card
+                        <span className="font-17 text-nowrap fw-bold mx-3">
+                          Bank
                         </span>
                       </div>
-                      <select
-                        onChange={(e) => setBankCardType(e.target.value)}
-                        style={{ marginRight: "30px" }}
-                        className="form-select shadow-none w-25"
-                        name=""
-                        id=""
-                      >
-                        <option className="font-14" selected disabled value="">
-                          Select
-                        </option>
-                        <option className="font-14" value="visa">
-                          Visa
-                        </option>
-                        <option className="font-14" value="master">
-                          Master Card
-                        </option>
-                        <option className="font-14" value="aexpress">
-                          American Express
-                        </option>
-                        <option className="font-14" value="others">
-                          Others
-                        </option>
-                      </select>
-                      <input
-                        onChange={(e) => setCardAmount(e.target.value)}
-                        disabled={cardMode === "active" ? false : true}
-                        className="w-35 text-end  form-control font-14 py-1 rounded-1 shadow-none"
-                        type="number"
-                      />
+                      <div className="col-1"></div>
+                      <div className="col-2">
+                        <select
+                          onChange={(e) => setBankAcc(e.target.value)}
+                          className="form-select shadow-none"
+                        >
+                          <option className="font-14" selected disabled value="">
+                            Select
+                          </option>
+                          {
+                            bankAccList.map((item) => {
+                              return (
+                                <option value={item.account_id}>{item.name}</option>
+                              )
+                            })
+                          }
+                        </select>
+                      </div>
+                      <div className="col-2">
+                        <select
+                          onChange={(e) => setBankAccCardType(e.target.value)}
+
+                          className="form-select shadow-none "
+                        >
+                          <option className="font-14" selected disabled value="">
+                            Select
+                          </option>
+                          <option value="VISA">Visa</option>
+                          <option value="MASTER">Master</option>
+                          <option value="EXPRESS">American Express</option>
+                        </select>
+                      </div>
+                      <div className="col-4">
+                        <input
+                          onChange={(e) => setCardAmount(e.target.value)}
+                          disabled={bankMode === "active" ? false : true}
+                          className="  form-control font-14 py-1 rounded-1 shadow-none"
+                          type="number"
+                        />
+                      </div>
                     </div>
-                    <div className="col-lg-12 d-flex justify-content-between align-items-center mb-2">
-                      <div className="d-flex justify-content-start align-items-center ms-2">
+                    <div className="row mb-2">
+                      <div className="col-4">
                         <input
                           onChange={(e) =>
                             setOtherMode(
                               `${otherMode === "active" ? "inactive" : "active"}`
                             )
                           }
-                          className="form-check-input mb-1 shadow-none "
+                          className="form-check-input ms-2  mb-1 shadow-none "
                           type="checkbox"
                         />
-                        <span className="font-17 text-nowrap fw-bold ms-3">
+                        <span className="font-17 text-nowrap fw-bold  mx-3">
                           Other
                         </span>
                       </div>
-                      <select
-                        onChange={(e) => setOtherType(e.target.value)}
-                        style={{ marginRight: "39px" }}
-                        className="form-select shadow-none w-25"
-                        name=""
-                        id=""
-                      >
-                        <option className="font-14" selected disabled value="">
-                          Select
-                        </option>
-                        <option value="bkash">Bkash</option>
-                        <option value="nogod">Nogod</option>
-                        <option value="others">Others</option>
-                      </select>
-                      <input
-                        onChange={(e) => setOtherAmount(e.target.value)}
-                        disabled={otherMode === "active" ? false : true}
-                        className="w-35 text-end  form-control font-14 py-1 rounded-1 shadow-none"
-                        type="number"
-                      />
+                      <div className="col-4">
+                        <select
+                          onChange={(e) => setOtherAcc(e.target.value)}
+                          style={{ marginRight: "39px" }}
+                          className="form-select shadow-none"
+                          name=""
+                          id=""
+                        >
+                          <option className="font-14" selected disabled value="">
+                            Select
+                          </option>
+                          {
+                            otherAccList.map((item) => {
+                              return (
+                                <option value={item.account_id}>{item.name}</option>
+                              )
+                            })
+                          }
+                        </select>
+                      </div>
+                      <div className="col-4">
+                        <input
+                          onChange={(e) => setOtherAmount(e.target.value)}
+                          disabled={otherMode === "active" ? false : true}
+                          className="form-control font-14 py-1 rounded-1 shadow-none"
+                          type="number"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

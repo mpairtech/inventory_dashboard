@@ -733,6 +733,12 @@ height: 2.5rem;
 .hover_effect2:hover{
   background-color: #f1fbff !important;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.selected_effect{
+  background-color: #f1fbff !important;
+  box-shadow: rgba(0, 0, 0, 0.055) 0px 3px 8px;
 }
 
 .active-category-box{

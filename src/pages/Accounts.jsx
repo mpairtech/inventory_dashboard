@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
-
+import toast from "react-hot-toast";
 const Accounts = () => {
 
   const { userInfo } = useAuth();
   const [update, setUpdate] = useState(0);
   const [storeList, setStoreList] = useState([]);
-  console.log(storeList)
+  const [data, setData] = useState([]);
+
+
+  const [store, setStore] = useState("");
+  const [name, setName] = useState("");
+  const [accType, setAccType] = useState("");
+  const [holderName, setHolderName] = useState("");
+  const [accNo, setAccNo] = useState("");
+  const [refNo, setRefNo] = useState("");
+  const [balance, setBalance] = useState("");
+  const [date, setDate] = useState("");
+
+  const [selectedAcc, setSelectedAcc] = useState({});
+
+  console.log(selectedAcc)
 
   const getDropDownStore = () => {
     const data = new FormData();
@@ -33,27 +47,53 @@ const Accounts = () => {
     e.preventDefault();
     const data = new FormData();
     data.append("org_id", userInfo.organizationData.org_id);
+    data.append("user_id", userInfo.user_id);
+    data.append("store_id", store);
+    data.append("name", name);
+    data.append("accountType", accType);
+    data.append("holder_name", holderName);
+    data.append("account_no", accNo);
+    data.append("ref_no", refNo);
+    data.append("balance", balance);
+    data.append("date", date);
 
-    fetch(`${import.meta.env.VITE_SERVER}/expense/addExpense`, {
+    fetch(`${import.meta.env.VITE_SERVER}/account/addAccount`, {
       method: "POST",
       body: data,
     })
       .then((res) => res.json())
       .then((res) => {
         console.log(res)
-        if (res?.expense_id) {
-          toast.success("Expense added successfully");
+        if (res?.account_id) {
+          toast.success("Account added successfully");
           setUpdate(!update);
         } else {
-          toast.error("Failed to Add Expense");
+          toast.error("Failed to Add Account");
         }
       })
       .catch((err) => {
-        toast.error("An error occurred while adding Expense");
+        toast.error("An error occurred while adding Account");
       });
   }
 
+  const getAllAccounts = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/account/getAccountsForOrg`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setData(res);
+      })
+      .catch((err) => console.log(err));
+  };
 
+  useEffect(() => {
+    getAllAccounts();
+  }, []);
 
   return (
     <div className="container-fluid">
@@ -155,7 +195,9 @@ const Accounts = () => {
                                 onChange={(e) => setAccType(e.target.value)}
                               >
                                 <option selected disabled value=""> Select Account Type</option>
-                                <option value="CASH"> CASH</option>
+                                <option value="CASH">Cash</option>
+                                <option value="BANK">Bank</option>
+                                <option value="OTHER">Other</option>
                               </select>
                             </div>
 
@@ -165,7 +207,7 @@ const Accounts = () => {
                                 Holder Name
                               </label>
                               <input
-                                type="number"
+                                type="text"
                                 className="form-control py-2 font-13 shadow-none bg-white"
                                 onChange={(e) => setHolderName(e.target.value)}
                               />
@@ -201,9 +243,21 @@ const Accounts = () => {
                                 Balance
                               </label>
                               <input
-                                type="date"
+                                type="number"
                                 className="form-control py-2 font-13 shadow-none bg-white"
                                 onChange={(e) => setBalance(e.target.value)}
+                              />
+                            </div>
+                            <div className="my-1 col-lg-6">
+                              <label
+                                className="col-form-label text-muted fw-500"
+                              >
+                                Date
+                              </label>
+                              <input
+                                type="date"
+                                className="form-control py-2 font-13 shadow-none bg-white"
+                                onChange={(e) => setDate(e.target.value)}
                               />
                             </div>
                           </div>
@@ -240,19 +294,19 @@ const Accounts = () => {
                 </div>
                 <div className="card-body min-vh-70 row">
                   <div className="row">
-                    <div className="col-6">
+                    <div className="col-4">
                       <div className="accordion accordion-flush " id="accordionFlushExample">
                         <div className="accordion-item ">
                           <h2 className="accordion-header">
                             <button
-                              className="accordion-button collapsed  shadow-none border-0"
+                              className="accordion-button collapsed shadow-none border-0"
                               type="button"
                               data-bs-toggle="collapse"
                               data-bs-target="#flush-collapseOne"
                               aria-expanded="false"
                               aria-controls="flush-collapseOne"
                             >
-                              Accordion Item #1
+                              Cash Accounts
                             </button>
                           </h2>
                           <div
@@ -261,23 +315,40 @@ const Accounts = () => {
                             data-bs-parent="#accordionFlushExample"
                           >
                             <div className="accordion-body">
-                              Placeholder content for this accordion, which is intended to demonstrate
-                              the <code>.accordion-flush</code> class. This is the first item's
-                              accordion body.
+                              {
+                                data
+                                  ?.filter((item) => item?.accountType === "CASH")
+                                  ?.map((item) => (
+                                    <div
+                                      onClick={() =>
+                                        setSelectedAcc(item)
+                                      }
+                                      key={item.account_id} className={`row border rounded-1  p-3 mb-2 cursor-pointer accordion ${selectedAcc === item ? "selected_effect" : ""}`}>
+                                      <div className="col-6">
+                                        <p className="fw-500 mb-0">{item?.name}</p>
+                                        <p className="text-muted mb-0">{item?.account_no}</p>
+                                      </div>
+                                      <div className="col-6">
+                                        <p className="fw-500 mb-0">{item?.balance}</p>
+                                        <p className="fw-500 mb-0">{item?.ref_no}</p>
+                                      </div>
+                                    </div>
+                                  ))
+                              }
                             </div>
                           </div>
                         </div>
                         <div className="accordion-item">
                           <h2 className="accordion-header">
                             <button
-                              className="accordion-button collapsed"
+                              className="accordion-button collapsed  shadow-none border-0"
                               type="button"
                               data-bs-toggle="collapse"
                               data-bs-target="#flush-collapseTwo"
                               aria-expanded="false"
                               aria-controls="flush-collapseTwo"
                             >
-                              Accordion Item #2
+                              Bank Accounts
                             </button>
                           </h2>
                           <div
@@ -286,24 +357,40 @@ const Accounts = () => {
                             data-bs-parent="#accordionFlushExample"
                           >
                             <div className="accordion-body">
-                              Placeholder content for this accordion, which is intended to demonstrate
-                              the <code>.accordion-flush</code> class. This is the second item's
-                              accordion body. Let's imagine this being filled with some actual
-                              content.
+                             {
+                                data
+                                  ?.filter((item) => item?.accountType === "BANK")
+                                  ?.map((item) => (
+                                    <div
+                                      onClick={() =>
+                                        setSelectedAcc(item)
+                                      }
+                                      key={item.account_id} className={`row border rounded-1  p-3 mb-2 cursor-pointer accordion ${selectedAcc === item ? "selected_effect" : ""}`}>
+                                      <div className="col-6">
+                                        <p className="fw-500 mb-0">{item?.name}</p>
+                                        <p className="text-muted mb-0">{item?.account_no}</p>
+                                      </div>
+                                      <div className="col-6">
+                                        <p className="fw-500 mb-0">{item?.balance}</p>
+                                        <p className="fw-500 mb-0">{item?.ref_no}</p>
+                                      </div>
+                                    </div>
+                                  ))
+                             }
                             </div>
                           </div>
                         </div>
                         <div className="accordion-item">
                           <h2 className="accordion-header">
                             <button
-                              className="accordion-button collapsed"
+                              className="accordion-button collapsed shadow-none border-0"
                               type="button"
                               data-bs-toggle="collapse"
                               data-bs-target="#flush-collapseThree"
                               aria-expanded="false"
                               aria-controls="flush-collapseThree"
                             >
-                              Accordion Item #3
+                              Other Accounts
                             </button>
                           </h2>
                           <div
@@ -312,19 +399,130 @@ const Accounts = () => {
                             data-bs-parent="#accordionFlushExample"
                           >
                             <div className="accordion-body">
-                              Placeholder content for this accordion, which is intended to demonstrate
-                              the <code>.accordion-flush</code> class. This is the third item's
-                              accordion body. Nothing more exciting happening here in terms of
-                              content, but just filling up the space to make it look, at least at
-                              first glance, a bit more representative of how this would look in a
-                              real-world application.
+                          {
+                                data
+                                  ?.filter((item) => item?.accountType === "OTHER")
+                                  ?.map((item) => (
+                                    <div
+                                      onClick={() =>
+                                        setSelectedAcc(item)
+                                      }
+                                      key={item.account_id} className={`row border rounded-1  p-3 mb-2 cursor-pointer accordion ${selectedAcc === item ? "selected_effect" : ""}`}>
+                                      <div className="col-6">
+                                        <p className="fw-500 mb-0">{item?.name}</p>
+                                        <p className="text-muted mb-0">{item?.account_no}</p>
+                                      </div>
+                                      <div className="col-6">
+                                        <p className="fw-500 mb-0">{item?.balance}</p>
+                                        <p className="fw-500 mb-0">{item?.ref_no}</p>
+                                      </div>
+                                    </div>
+                                  ))
+                          }
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-6">
-                      asddas
+                    <div className="col-8">
+                      <div className="card">
+                        <div className="card-header font-16 fw-500">
+                          <p>Bank Account Details</p>
+                        </div>
+                        <div className="card-body">
+                          <div className="mb-3">
+                            <label htmlFor="accountName" className="form-label">
+                              Account Name
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="accountName"
+                              value={selectedAcc.name}
+                              readOnly
+                            />
+                          </div>
+
+                          <div className="mb-3">
+                            <label htmlFor="accountType" className="form-label">
+                              Account Type
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="accountType"
+                              value={selectedAcc.accountType}
+                              readOnly
+                            />
+                          </div>
+
+                          <div className="mb-3">
+                            <label htmlFor="holderName" className="form-label">
+                              Holder Name
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="holderName"
+                              value={selectedAcc.holder_name}
+                              readOnly
+                            />
+                          </div>
+
+                          <div className="mb-3">
+                            <label htmlFor="accountNo" className="form-label">
+                              Account Number
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="accountNo"
+                              value={selectedAcc.account_no}
+                              readOnly
+                            />
+                          </div>
+
+                          <div className="mb-3">
+                            <label htmlFor="balance" className="form-label">
+                              Balance
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="balance"
+                              value={selectedAcc.balance}
+                              readOnly
+                            />
+                          </div>
+
+                          <div className="mb-3">
+                            <label htmlFor="status" className="form-label">
+                              Status
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="status"
+                              value={selectedAcc.status}
+                              readOnly
+                            />
+                          </div>
+
+                          <div className="mb-3">
+                            <label htmlFor="createdAt" className="form-label">
+                              Created At
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="createdAt"
+                              value={new Date().toLocaleString()}
+                              readOnly
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
