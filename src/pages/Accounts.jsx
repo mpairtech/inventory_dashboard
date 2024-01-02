@@ -28,12 +28,12 @@ const Accounts = () => {
   }, [update]);
 
 
-  
+
   const addAccount = (e) => {
     e.preventDefault();
     const data = new FormData();
     data.append("org_id", userInfo.organizationData.org_id);
- 
+
     fetch(`${import.meta.env.VITE_SERVER}/expense/addExpense`, {
       method: "POST",
       body: data,
@@ -111,7 +111,7 @@ const Accounts = () => {
                                 Store
                               </label>
                               <select
-                                className="form-control py-2 font-13 shadow-none"
+                                className="form-control py-2 font-13 shadow-none "
                                 onChange={(e) => setStore(e.target.value)}
                               >
                                 <option selected disabled value="">
@@ -239,178 +239,94 @@ const Accounts = () => {
                   <div className="row mt-2"></div>
                 </div>
                 <div className="card-body min-vh-70 row">
-
-                <>
-  <div className="single-accordion">
-    <div className="accordion-style-one">
-      <div className="accordion" id="accordion">
-        <div className="card">
-          <div className="card-header" id="headingOne">
-            <a
-              href="#collapseOne"
-              data-bs-toggle="collapse"
-              role="button"
-              aria-expanded="true"
-            >
-              Accordions title here
-            </a>
-          </div>
-          <div
-            id="collapseOne"
-            className="collapse show"
-            data-bs-parent="#accordion"
-          >
-            <div className="card-body">
-              <p className="text">
-                Raw denim you probably haven’t heard of them jean shorts Austin.
-                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
-                Mustache cliche tempor, williamsburg carles vegan helvetica.
-                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
-                <br />
-                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
-                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
-                cardigan american apparel, butcher voluptate nisi qui.
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* card */}
-        <div className="card">
-          <div className="card-header" id="headingTwo">
-            <a
-              className="collapsed"
-              href="#collapseTwo"
-              data-bs-toggle="collapse"
-              role="button"
-              aria-expanded="false"
-            >
-              Accordions title here
-            </a>
-          </div>
-          <div
-            id="collapseTwo"
-            className="collapse"
-            data-bs-parent="#accordion"
-          >
-            <div className="card-body">
-              <p className="text">
-                Raw denim you probably haven’t heard of them jean shorts Austin.
-                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
-                Mustache cliche tempor, williamsburg carles vegan helvetica.
-                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
-                <br />
-                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
-                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
-                cardigan american apparel, butcher voluptate nisi qui.
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* card */}
-        <div className="card">
-          <div className="card-header" id="headingThree">
-            <a
-              className="collapsed"
-              href="#collapseThree"
-              data-bs-toggle="collapse"
-              role="button"
-              aria-expanded="false"
-            >
-              Accordions title here
-            </a>
-          </div>
-          <div
-            id="collapseThree"
-            className="collapse"
-            data-bs-parent="#accordion"
-          >
-            <div className="card-body">
-              <p className="text">
-                Raw denim you probably haven’t heard of them jean shorts Austin.
-                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
-                Mustache cliche tempor, williamsburg carles vegan helvetica.
-                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
-                <br />
-                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
-                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
-                cardigan american apparel, butcher voluptate nisi qui.
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* card */}
-        <div className="card">
-          <div className="card-header" id="headingFour">
-            <a
-              className="collapsed"
-              href="#collapseFour"
-              data-bs-toggle="collapse"
-              role="button"
-              aria-expanded="false"
-            >
-              Accordions title here
-            </a>
-          </div>
-          <div
-            id="collapseFour"
-            className="collapse"
-            data-bs-parent="#accordion"
-          >
-            <div className="card-body">
-              <p className="text">
-                Raw denim you probably haven’t heard of them jean shorts Austin.
-                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
-                Mustache cliche tempor, williamsburg carles vegan helvetica.
-                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
-                <br />
-                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
-                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
-                cardigan american apparel, butcher voluptate nisi qui.
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* card */}
-        <div className="card">
-          <div className="card-header" id="headingFive">
-            <a
-              className="collapsed"
-              href="#collapseFive"
-              data-bs-toggle="collapse"
-              role="button"
-              aria-expanded="false"
-            >
-              Accordions title here
-            </a>
-          </div>
-          <div
-            id="collapseFive"
-            className="collapse"
-            data-bs-parent="#accordion"
-          >
-            <div className="card-body">
-              <p className="text">
-                Raw denim you probably haven’t heard of them jean shorts Austin.
-                Nesciunt tofu stumptown aliqua, retro synth master cleanse.
-                Mustache cliche tempor, williamsburg carles vegan helvetica.
-                Reprehenderit butcher retro keffiyeh dreamcatcher synth. <br />
-                <br />
-                Cosby sweater eu banh mi, qui irure terry richardson ex squid.
-                Aliquip placeat salvia cillum iphone. Seitan aliquip quis
-                cardigan american apparel, butcher voluptate nisi qui.
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* card */}
-      </div>
-    </div>
-    {/* card */}
-  </div>
-  {/* accordion style one */}
-</>
-
-
+                  <div className="row">
+                    <div className="col-6">
+                      <div className="accordion accordion-flush " id="accordionFlushExample">
+                        <div className="accordion-item ">
+                          <h2 className="accordion-header">
+                            <button
+                              className="accordion-button collapsed  shadow-none border-0"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#flush-collapseOne"
+                              aria-expanded="false"
+                              aria-controls="flush-collapseOne"
+                            >
+                              Accordion Item #1
+                            </button>
+                          </h2>
+                          <div
+                            id="flush-collapseOne"
+                            className="accordion-collapse collapse"
+                            data-bs-parent="#accordionFlushExample"
+                          >
+                            <div className="accordion-body">
+                              Placeholder content for this accordion, which is intended to demonstrate
+                              the <code>.accordion-flush</code> class. This is the first item's
+                              accordion body.
+                            </div>
+                          </div>
+                        </div>
+                        <div className="accordion-item">
+                          <h2 className="accordion-header">
+                            <button
+                              className="accordion-button collapsed"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#flush-collapseTwo"
+                              aria-expanded="false"
+                              aria-controls="flush-collapseTwo"
+                            >
+                              Accordion Item #2
+                            </button>
+                          </h2>
+                          <div
+                            id="flush-collapseTwo"
+                            className="accordion-collapse collapse"
+                            data-bs-parent="#accordionFlushExample"
+                          >
+                            <div className="accordion-body">
+                              Placeholder content for this accordion, which is intended to demonstrate
+                              the <code>.accordion-flush</code> class. This is the second item's
+                              accordion body. Let's imagine this being filled with some actual
+                              content.
+                            </div>
+                          </div>
+                        </div>
+                        <div className="accordion-item">
+                          <h2 className="accordion-header">
+                            <button
+                              className="accordion-button collapsed"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#flush-collapseThree"
+                              aria-expanded="false"
+                              aria-controls="flush-collapseThree"
+                            >
+                              Accordion Item #3
+                            </button>
+                          </h2>
+                          <div
+                            id="flush-collapseThree"
+                            className="accordion-collapse collapse"
+                            data-bs-parent="#accordionFlushExample"
+                          >
+                            <div className="accordion-body">
+                              Placeholder content for this accordion, which is intended to demonstrate
+                              the <code>.accordion-flush</code> class. This is the third item's
+                              accordion body. Nothing more exciting happening here in terms of
+                              content, but just filling up the space to make it look, at least at
+                              first glance, a bit more representative of how this would look in a
+                              real-world application.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      asddas
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
