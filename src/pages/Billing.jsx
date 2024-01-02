@@ -62,11 +62,66 @@ const Billing = () => {
       cell: (row) => (
         <>
           <Link
-            to={`/supplier/${row.supplier_id}`}
             className="border-0"
+            data-bs-toggle="modal"
+            data-bs-target={`#exampleModalView${row.expense_id}`}
           >
-            <i class="fa-regular fa-circle-right fa-lg"></i>
+            <i class="fa-regular fa-eye fa-lg"></i>
           </Link>
+
+          <div
+            className="modal fade "
+            id={`exampleModalView${row.expense_id}`}
+            tabIndex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h1 className="modal-title font-14" id="exampleModalLabel">
+                    View Supplier Bill
+                  </h1>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body font-14">
+                  <p><strong>Bill Number:</strong> {row.bill_no}</p>
+                  <p><strong>Bill Amount:</strong> {row.bill_amount}</p>
+                  <p><strong>Date:</strong> {new Date(row.date).toLocaleString()}</p>
+                  <p><strong>Items:</strong></p>
+                  <ul>
+                    {row.items.map((item, index) => (
+                      <li key={index}>
+                        <p><strong>Item:</strong> {item.item}</p>
+                        <p><strong>Product Details:</strong></p>
+                        <ul>
+                          <li><strong>Name:</strong> {item.productDetails.name}</li>
+                          <li><strong>Price:</strong> {item.productDetails.price}</li>
+                          {/* Add other details as needed */}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn_secondary font-13"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <button
             className="border-0 ms-2"
             data-bs-toggle="modal"
@@ -203,7 +258,7 @@ const Billing = () => {
   const [billNo, setBillNo] = useState('');
   const [totalBillAmount, setTotalBillAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString());
-  
+
   const addSupplierBill = (e) => {
     e.preventDefault();
     const data = new FormData();

@@ -163,6 +163,38 @@ const SupplierView = () => {
     getSupplierData();
   }, []);
 
+  const [date, setDate] = useState("");
+  const [supplierBill, setSupplierBill] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const sendTransaction = (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    data.append("user_id", userInfo?.user_id);
+    data.append("supplier_bill_id", supplierBill);
+    data.append("amount", amount);
+    data.append("date", date);
+    fetch(`${import.meta.env.VITE_SERVER}/supplier/createSupplierTransaction`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        if (res?.supplier_transaction_id) {
+          toast.success("Transaction successful");
+          // setUpdate(!update);
+        } else {
+          toast.error("Transaction failed");
+        }
+      })
+      .catch((err) => {
+        toast.error("An error occurred while transaction");
+      });
+  }
+
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -491,7 +523,7 @@ const SupplierView = () => {
                       {activeTab === "transaction" && (
                         <div className="mt-3 mx-3">
                           <div className="row">
-                            <form onSubmit={{}} className="col-lg-12 ">
+                            <form onSubmit={sendTransaction} className="col-lg-12 ">
                               <div className="d-flex justify-content-between align-items-center ">
                                 <p className="fw-500">
                                   Add New Transaction
@@ -518,18 +550,20 @@ const SupplierView = () => {
                                       htmlFor="recipient-name"
                                       className="col-form-label text-muted "
                                     >
-                                      Supplier
+                                      Bill
                                     </label>
                                     <select
                                       className="form-control font-13 shadow-none"
-                                      onChange={(e) => setSupplierType(e.target.value)}
+                                      onChange={(e) => setSupplierBill(e.target.value)}
                                     >
                                       <option selected disabled value="">
-                                        Select Supplier Type
+                                        Select Bill
                                       </option>
-                                      <option value="test">
-                                        test
-                                      </option>
+                                      {
+                                        supplierData?.supplier_bill?.map((bill) => (
+                                          <option value={bill.bill_id}>{bill.bill_no}</option>
+                                        ))
+                                      }
                                     </select>
                                   </div>
 
@@ -543,7 +577,7 @@ const SupplierView = () => {
                                     <input
                                       type="number"
                                       className="form-control font-13 shadow-none bg-white"
-                                      onChange={(e) => setOpBalance(e.target.value)}
+                                      onChange={(e) => setAmount(e.target.value)}
                                     />
                                   </div>
                                 </div>
