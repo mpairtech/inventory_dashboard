@@ -24,48 +24,27 @@ const customStyles = {
 
 const SupplierView = () => {
   const columns = [
-    {
 
-      sortable: true,
-      minWidth: false,
-      center: true,
-      width: "50px",
-    },
     {
-      name: "Supplier Name",
-      selector: (row) => row.supplier_name,
+      name: "Transaction ID",
+      selector: (row) => row?.supplier_transaction_id,
       sortable: true,
       minWidth: false,
     },
     {
-      name: "Supplier Type",
-      selector: (row) => row.supplier_type,
+      name: "Supplier ID",
+      selector: (row) => row.supplier_id,
       sortable: true,
       minWidth: false,
     },
     {
-      name: "Contact Person",
-      selector: (row) => row.contact_person,
+      name: "Amount",
+      selector: (row) => row.amount,
       sortable: true,
     },
     {
-      name: "Contact Number",
-      selector: (row) => row.contact_number,
-      sortable: true,
-    },
-    {
-      name: "Location",
-      selector: (row) => row.location,
-      sortable: true,
-    },
-    {
-      name: "Out Balance",
-      selector: (row) => row.op_balance,
-      sortable: true,
-    },
-    {
-      name: "Create Date",
-      selector: (row) => formatDate(row.createdAt),
+      name: " Date",
+      selector: (row) => formatDate(row.date),
       sortable: true,
       minWidth: false,
     },
@@ -140,7 +119,8 @@ const SupplierView = () => {
   const { id: supplier_id } = useParams();
   const [supplierData, setSupplierData] = useState({});
   console.log(supplierData)
-
+  const [accountsData, setAccountsData] = useState([]);
+  const [update, setUpdate] = useState(false);
   const [activeTab, setActiveTab] = useState("report");
 
   const getSupplierData = () => {
@@ -159,20 +139,42 @@ const SupplierView = () => {
       .catch((err) => console.log(err));
   };
 
+  const getAllAccounts = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/account/getAccountsForOrg`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setAccountsData(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+
+
   useEffect(() => {
     getSupplierData();
-  }, []);
+    getAllAccounts();
+  }, [update]);
 
   const [date, setDate] = useState("");
-  const [supplierBill, setSupplierBill] = useState("");
+  const [supplierBill, setSupplierBill] = useState(null);
+  console.log(supplierBill)
   const [amount, setAmount] = useState("");
-
+  const [account, setAccount] = useState(null);
+  console.log(account)
   const sendTransaction = (e) => {
     e.preventDefault();
     const data = new FormData();
     data.append("org_id", userInfo.organizationData.org_id);
     data.append("user_id", userInfo?.user_id);
-    data.append("supplier_bill_id", supplierBill);
+    data.append("supplier_id", supplier_id);
+    data.append("supplier_bill_id", supplierBill.supplier_bill_id);
+    data.append("account_id", account.account_id);
     data.append("amount", amount);
     data.append("date", date);
     fetch(`${import.meta.env.VITE_SERVER}/supplier/createSupplierTransaction`, {
@@ -183,6 +185,7 @@ const SupplierView = () => {
       .then((res) => {
         console.log(res)
         if (res?.supplier_transaction_id) {
+          setUpdate(!update);
           toast.success("Transaction successful");
           // setUpdate(!update);
         } else {
@@ -345,9 +348,9 @@ const SupplierView = () => {
                           id="printarea"
                           className="mx-3 mt-3 border shadow-sm bg-white py-4 "
                         >
-                          <p className="font-18 mb-0 text-center">Inventory Report</p>
-                          <p className="font-16 mb-0 text-center">ORG NAME</p>
-                          <p className="font-14 text-center mb-0">Supplier List</p>
+                          <p className="font-18 mb-0 text-center">Supplier Report</p>
+                          {/* <p className="font-16 mb-0 text-center">ORG NAME</p> */}
+                          {/* <p className="font-14 text-center mb-0">Supplier List</p> */}
                           <p className="font-12 text-center my-1">
                             Date: {new Date().toLocaleDateString()}
                           </p>
@@ -364,9 +367,9 @@ const SupplierView = () => {
                                 <th
                                   scope="col"
                                   className="border-0 font-13 text-muted font-weight-600 ps-4"
-                                  width="60%"
+                                  width="20%"
                                 >
-                                  Name
+                                  Date
                                 </th>
 
                                 <th
@@ -374,7 +377,21 @@ const SupplierView = () => {
                                   className="border-0 font-13 text-muted font-weight-600"
                                   width="30%"
                                 >
-                                  Amount
+                                  Particular
+                                </th>
+                                <th
+                                  scope="col"
+                                  className="border-0 font-13 text-muted font-weight-600"
+                                  width="20%"
+                                >
+                                  Payable
+                                </th>
+                                <th
+                                  scope="col"
+                                  className="border-0 font-13 text-muted font-weight-600"
+                                  width="0%"
+                                >
+                                  Paid
                                 </th>
 
                               </tr>
@@ -382,8 +399,7 @@ const SupplierView = () => {
                             <tbody className="border-0">
 
                               <tr className="border-bottom">
-                                <td
-                                  scope="col"
+                                <td scope="col"
                                   className="border-0 font-12 ps-4"
                                 >
                                 </td>
@@ -391,7 +407,7 @@ const SupplierView = () => {
                                   scope="col"
                                   className="border-0 font-12 ps-4"
                                 >
-                                  Total Sell
+                                  {formatDate(supplierData?.createdAt)}
                                 </td>
                                 <td
                                   scope="col"
@@ -401,21 +417,8 @@ const SupplierView = () => {
                                     className="d-inline-block text-truncate"
                                     style={{ maxWidth: "250px" }}
                                   >
-                                    123
+                                    Opening Balance
                                   </span>
-                                </td>
-                              </tr>
-                              <tr className="border-bottom">
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                  Total Amount
                                 </td>
                                 <td
                                   scope="col"
@@ -425,21 +428,8 @@ const SupplierView = () => {
                                     className="d-inline-block text-truncate"
                                     style={{ maxWidth: "250px" }}
                                   >
-                                    123
+                                    {supplierData?.op_balance}
                                   </span>
-                                </td>
-                              </tr>
-                              <tr className="border-bottom">
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                  Cash Payments
                                 </td>
                                 <td
                                   scope="col"
@@ -449,72 +439,116 @@ const SupplierView = () => {
                                     className="d-inline-block text-truncate"
                                     style={{ maxWidth: "250px" }}
                                   >
-                                    123
+                                    {/* {supplierData?.supplier_transaction?.reduce((a, b) => a + +b.amount, 0)} */} 0
                                   </span>
                                 </td>
                               </tr>
+                              {/* map here */}
+                              {
+                                supplierData?.supplier_bill?.map((bill) => (
+                                  <>
+                                    <tr className="border-bottom">
+                                      <td scope="col"
+                                        className="border-0 font-12 ps-4"
+                                      >
+                                      </td>
+                                      <td
+                                        scope="col"
+                                        className="border-0 font-12 ps-4"
+                                      >
+                                        {formatDate(bill.date)}
+                                      </td>
+                                      <td
+                                        scope="col"
+                                        className="border-0 font-12 font-weight-600"
+                                      >
+                                        <span
+                                          className="d-inline-block text-truncate"
+                                          style={{ maxWidth: "250px" }}
+                                        >
+                                          Bill-{bill.bill_no}
+                                        </span>
+                                      </td>
+                                      <td
+                                        scope="col"
+                                        className="border-0 font-12 font-weight-600"
+                                      >
+                                        <span
+                                          className="d-inline-block text-truncate"
+                                          style={{ maxWidth: "250px" }}
+                                        >
+                                          {bill.bill_amount}
+                                        </span>
+                                      </td>
+                                      <td
+                                        scope="col"
+                                        className="border-0 font-12 font-weight-600"
+                                      >
+                                        <span
+                                          className="d-inline-block text-truncate"
+                                          style={{ maxWidth: "250px" }}
+                                        >
+                                          {/* (paid_amount from transaction) */}
+                                          0
+                                        </span>
+                                      </td>
+                                    </tr>
 
-                              <tr className="border-bottom">
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4 fw-medium"
-                                >
-                                  Bank Payments
-                                </td>
-                              </tr>
-                              <tr className="border-bottom">
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                  DBBL
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 font-weight-600"
-                                >
-                                  <span
-                                    className="d-inline-block text-truncate"
-                                    style={{ maxWidth: "250px" }}
-                                  >
-                                    123
-                                  </span>
-                                </td>
-                              </tr>
-                              <tr className="border-bottom">
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                  The City Bank
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 font-weight-600"
-                                >
-                                  <span
-                                    className="d-inline-block text-truncate"
-                                    style={{ maxWidth: "250px" }}
-                                  >
-                                    456
-                                  </span>
-                                </td>
-                              </tr>
+                                    {supplierData?.supplier_transaction?.filter((transaction) => transaction.supplier_bill_id === bill.supplier_bill_id)?.map((transaction) => (
+                                      <tr className="border-bottom">
+                                        <td scope="col"
+                                          className="border-0 font-12 ps-4"
+                                        >
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 ps-4"
+                                        >
+                                          {formatDate(transaction.date)}
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                          >
+                                            Payment-{transaction.supplier_transaction_id}, ({transaction?.account?.name}), Type: {transaction?.account?.accountType}
+                                          </span>
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                            style={{ maxWidth: "250px" }}
+                                          >
+                                            0
+                                          </span>
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                            style={{ maxWidth: "250px" }}
+                                          >
+                                            {/* (paid_amount from transaction) */}
+                                            {/* {supplierData?.supplier_transaction?.filter((transaction) => transaction.supplier_bill_id === bill.supplier_bill_id)?.reduce((a, b) => a + +b.amount, 0)} */}
+                                            {transaction.amount}
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    ))}
+
+
+                                  </>
+                                ))
+                              }
+
+
                             </tbody>
                           </table>
                         </div>
@@ -528,24 +562,18 @@ const SupplierView = () => {
                                 <p className="fw-500">
                                   Add New Transaction
                                 </p>
-                                <p><span className="fw-500">Due Amount: </span><span>5000 BDT</span></p>
+                                {
+                                  supplierData && <p><span className="fw-500">Due Amount: </span><span className="">
+                                    {
+                                      +supplierData?.op_balance - +supplierData?.supplier_transaction?.reduce((a, b) => a + +b.amount, 0)
+                                    } BDT
+                                  </span></p>
+                                }
+
                               </div>
-                              <div className="col-lg-12 ">
-                                <div className="row">
-                                  <div className=" col-lg-6">
-                                    <label
-                                      htmlFor="recipient-name"
-                                      className="col-form-label text-muted "
-                                    >
-                                      Payment Date
-                                    </label>
-                                    <input
-                                      type="date"
-                                      className="form-control font-13 shadow-none bg-white"
-                                      onChange={(e) => setDate(e.target.value)}
-                                    />
-                                  </div>
-                                  <div className="col-lg-6">
+                              <div className="row">
+                                <div className="col-lg-6 ">
+                                  <div className="">
                                     <label
                                       htmlFor="recipient-name"
                                       className="col-form-label text-muted "
@@ -554,20 +582,22 @@ const SupplierView = () => {
                                     </label>
                                     <select
                                       className="form-control font-13 shadow-none"
-                                      onChange={(e) => setSupplierBill(e.target.value)}
+                                      onChange={(e) => setSupplierBill(JSON.parse(e.target.value))}
                                     >
                                       <option selected disabled value="">
                                         Select Bill
                                       </option>
                                       {
                                         supplierData?.supplier_bill?.map((bill) => (
-                                          <option value={bill.bill_id}>{bill.bill_no}</option>
+                                          <option value={JSON.stringify(bill)}>{bill.bill_no}</option>
                                         ))
                                       }
                                     </select>
                                   </div>
 
-                                  <div className="col-lg-6">
+
+
+                                  <div className="">
                                     <label
                                       htmlFor="message-text"
                                       className="col-form-label text-muted "
@@ -580,30 +610,101 @@ const SupplierView = () => {
                                       onChange={(e) => setAmount(e.target.value)}
                                     />
                                   </div>
+
+                                  <div className="">
+                                    <label
+                                      htmlFor="recipient-name"
+                                      className="col-form-label text-muted "
+                                    >
+                                      Account
+                                    </label>
+                                    <select
+                                      className="form-control font-13 shadow-none"
+                                      onChange={(e) => setAccount(JSON.parse(e.target.value))}
+                                    >
+                                      <option selected disabled value="">
+                                        Select Account
+                                      </option>
+                                      {
+                                        accountsData?.map((account) => (
+                                          <option value={JSON.stringify(account)}>{account.name}</option>
+                                        ))
+                                      }
+                                    </select>
+                                  </div>
+
+                                  <div className="">
+                                    <label
+                                      htmlFor="recipient-name"
+                                      className="col-form-label text-muted "
+                                    >
+                                      Payment Date
+                                    </label>
+                                    <input
+                                      type="date"
+                                      className="form-control font-13 shadow-none bg-white"
+                                      onChange={(e) => setDate(e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="modal-footer">
+                                    <button
+                                      type="submit"
+                                      className="btn_primary mt-3"
+                                    >
+                                      Submit
+                                    </button>
+                                  </div>
                                 </div>
+                                {
+                                  supplierBill && (
+                                    <div className="col-6 font-14">
+                                      <p><strong>Bill Number:</strong> {supplierBill?.bill_no}</p>
+                                      <p><strong>Bill Amount:</strong> {supplierBill?.bill_amount}</p>
+                                      <p><strong>Date:</strong> {new Date(supplierBill?.date).toLocaleString()}</p>
+                                      <p><strong>Items:</strong></p>
+                                      <ul>
+                                        {supplierBill?.items?.map((item, index) => (
+                                          <li key={index}>
+                                            <p><strong>{index + 1})</strong> {item}</p>
+                                            <ul>
+
+                                            </ul>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                      <p><strong>Transaction History:</strong></p>
+                                      {
+                                        supplierBill && <p><span className="fw-500">Due Amount: </span><span className="">
+                                          {
+                                            +supplierBill?.bill_amount - +supplierData?.supplier_transaction?.reduce((a, b) => a + +b.amount, 0)
+                                          } BDT
+                                        </span></p>
+                                      }
+                                      <table className="table">
+                                        <thead>
+                                          <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Amount</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {supplierData?.supplier_transaction?.map((item, index) => (
+                                            <tr key={index}>
+                                              <td>{formatDate(item.date)}</td>
+                                              <td>{item.amount} BDT</td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+
+                                    </div>
+                                  )
+                                }
                               </div>
-                              <div className="modal-footer">
-                                <button
-                                  type="submit"
-                                  className="btn_primary mt-3"
-                                >
-                                  Submit
-                                </button>
-                              </div>
+
                             </form>
                           </div>
-                          <div>
-                            <DataTable
-                              noHeader
-                              columns={columns}
-                              data={[]}
-                              customStyles={customStyles}
-                              pagination
-                              paginationPerPage={5}
-                              paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
-                              className="table table-bordered"
-                            />
-                          </div>
+
                         </div>
                       )}
 
