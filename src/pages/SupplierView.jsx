@@ -118,10 +118,19 @@ const SupplierView = () => {
   const { userInfo } = useAuth();
   const { id: supplier_id } = useParams();
   const [supplierData, setSupplierData] = useState({});
+
   console.log(supplierData)
   const [accountsData, setAccountsData] = useState([]);
   const [update, setUpdate] = useState(false);
   const [activeTab, setActiveTab] = useState("report");
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 2).toISOString();
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+  
+  const [filterFromDate, setFilterFromDate] = useState(startOfMonth);
+  const [filterToDate, setFilterToDate] = useState(endOfMonth);
+
 
   const getSupplierData = () => {
     const data = new FormData();
@@ -167,6 +176,7 @@ const SupplierView = () => {
   const [amount, setAmount] = useState("");
   const [account, setAccount] = useState(null);
   console.log(account)
+
   const sendTransaction = (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -344,214 +354,219 @@ const SupplierView = () => {
                       </div>
 
                       {activeTab === "report" && (
-                        <div
-                          id="printarea"
-                          className="mx-3 mt-3 border shadow-sm bg-white py-4 "
-                        >
-                          <p className="font-18 mb-0 text-center">Supplier Report</p>
-                          {/* <p className="font-16 mb-0 text-center">ORG NAME</p> */}
-                          {/* <p className="font-14 text-center mb-0">Supplier List</p> */}
-                          <p className="font-12 text-center my-1">
-                            Date: {new Date().toLocaleDateString()}
-                          </p>
-                          <p className="font-12 text-center my-1">NOTE: All amounts are shown in BDT.</p>
-                          <table className="table align-middle mt-2">
-                            <thead>
-                              <tr className="thead-color border">
-                                <th
-                                  scope="col"
-                                  className="border-0 font-13 text-muted font-weight-600 ps-4"
-                                  width="10%"
-                                >
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="border-0 font-13 text-muted font-weight-600 ps-4"
-                                  width="20%"
-                                >
-                                  Date
-                                </th>
+                        <>
+                          <div className="mx-3 mt-3 d-flex align-items-center w-35 gap-1 ">
+                            <input
+                              type="date"
+                              className="form-control font-13 shadow-none bg-white"
+                              onChange={(e) => setFilterFromDate(new Date(e.target.value).toISOString())}
+                              value={new Date(filterFromDate).toISOString().slice(0, 10)}
+                            />
+                            -
+                            <input
+                              type="date"
+                              className="form-control font-13 shadow-none bg-white"
+                              onChange={(e) => setFilterToDate(new Date(e.target.value).toISOString())}
+                              value={new Date(filterToDate).toISOString().slice(0, 10)}
+                            />
+                          </div>
+                          <div
+                            id="printarea"
+                            className="mx-3 mt-3 border shadow-sm bg-white py-4 "
+                          >
+                            <p className="font-18 mb-0 text-center">Supplier Report</p>
+                            {/* <p className="font-16 mb-0 text-center">ORG NAME</p> */}
+                            {/* <p className="font-14 text-center mb-0">Supplier List</p> */}
+                            <p className="font-12 text-center my-1">
+                              Date: {new Date().toLocaleDateString()}
+                            </p>
+                            <p className="font-12 text-center my-1">NOTE: All amounts are shown in BDT.</p>
+                            <table className="table align-middle mt-2">
+                              <thead>
+                                <tr className="thead-color border">
 
-                                <th
-                                  scope="col"
-                                  className="border-0 font-13 text-muted font-weight-600"
-                                  width="30%"
-                                >
-                                  Particular
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="border-0 font-13 text-muted font-weight-600"
-                                  width="20%"
-                                >
-                                  Payable
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="border-0 font-13 text-muted font-weight-600"
-                                  width="0%"
-                                >
-                                  Paid
-                                </th>
-
-                              </tr>
-                            </thead>
-                            <tbody className="border-0">
-
-                              <tr className="border-bottom">
-                                <td scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 ps-4"
-                                >
-                                  {formatDate(supplierData?.createdAt)}
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 font-weight-600"
-                                >
-                                  <span
-                                    className="d-inline-block text-truncate"
-                                    style={{ maxWidth: "250px" }}
+                                  <th
+                                    scope="col"
+                                    className="border-0 font-13 text-muted font-weight-600 ps-4"
+                                    width="10%"
                                   >
-                                    Opening Balance
-                                  </span>
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 font-weight-600"
-                                >
-                                  <span
-                                    className="d-inline-block text-truncate"
-                                    style={{ maxWidth: "250px" }}
+                                    Date
+                                  </th>
+
+                                  <th
+                                    scope="col"
+                                    className="border-0 font-13 text-muted font-weight-600"
+                                    width="30%"
                                   >
-                                    {supplierData?.op_balance}
-                                  </span>
-                                </td>
-                                <td
-                                  scope="col"
-                                  className="border-0 font-12 font-weight-600"
-                                >
-                                  <span
-                                    className="d-inline-block text-truncate"
-                                    style={{ maxWidth: "250px" }}
+                                    Particular
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="border-0 font-13 text-muted font-weight-600"
+                                    width="20%"
                                   >
-                                    {/* {supplierData?.supplier_transaction?.reduce((a, b) => a + +b.amount, 0)} */} 0
-                                  </span>
-                                </td>
-                              </tr>
-                              {/* map here */}
-                              {
-                                supplierData?.supplier_bill?.map((bill) => (
-                                  <>
-                                    <tr className="border-bottom">
-                                      <td scope="col"
-                                        className="border-0 font-12 ps-4"
-                                      >
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 ps-4"
-                                      >
-                                        {formatDate(bill.date)}
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
-                                      >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
-                                        >
-                                          Bill-{bill.bill_no}
-                                        </span>
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
-                                      >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
-                                        >
-                                          {bill.bill_amount}
-                                        </span>
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
-                                      >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
-                                        >
-                                          {/* (paid_amount from transaction) */}
-                                          0
-                                        </span>
-                                      </td>
-                                    </tr>
+                                    Payable
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="border-0 font-13 text-muted font-weight-600"
+                                    width="10%"
+                                  >
+                                    Paid
+                                  </th>
 
-                                    {supplierData?.supplier_transaction?.filter((transaction) => transaction.supplier_bill_id === bill.supplier_bill_id)?.map((transaction) => (
-                                      <tr className="border-bottom">
-                                        <td scope="col"
-                                          className="border-0 font-12 ps-4"
-                                        >
-                                        </td>
-                                        <td
-                                          scope="col"
-                                          className="border-0 font-12 ps-4"
-                                        >
-                                          {formatDate(transaction.date)}
-                                        </td>
-                                        <td
-                                          scope="col"
-                                          className="border-0 font-12 font-weight-600"
-                                        >
-                                          <span
-                                            className="d-inline-block text-truncate"
+                                </tr>
+                              </thead>
+                              <tbody className="border-0">
+
+                                <tr className="border-bottom">
+
+                                  <td
+                                    scope="col"
+                                    className="border-0 font-12 ps-4"
+                                  >
+                                    {formatDate(supplierData?.createdAt)}
+                                  </td>
+                                  <td
+                                    scope="col"
+                                    className="border-0 font-12 font-weight-600"
+                                  >
+                                    <span
+                                      className="d-inline-block text-truncate"
+                                      style={{ maxWidth: "250px" }}
+                                    >
+                                      Opening Balance
+                                    </span>
+                                  </td>
+                                  <td
+                                    scope="col"
+                                    className="border-0 font-12 font-weight-600"
+                                  >
+                                    <span
+                                      className="d-inline-block text-truncate"
+                                      style={{ maxWidth: "250px" }}
+                                    >
+                                      {supplierData?.op_balance}
+                                    </span>
+                                  </td>
+                                  <td
+                                    scope="col"
+                                    className="border-0 font-12 font-weight-600"
+                                  >
+                                    <span
+                                      className="d-inline-block text-truncate"
+                                      style={{ maxWidth: "250px" }}
+                                    >
+                                      {/* {supplierData?.supplier_transaction?.reduce((a, b) => a + +b.amount, 0)} */} 0
+                                    </span>
+                                  </td>
+                                </tr>
+                                {/* map here */}
+                                {
+                                  supplierData?.supplier_bill
+                                    ?.filter(transaction => new Date(transaction.date) >= new Date(filterFromDate) && new Date(transaction.date) <= new Date(filterToDate))
+                                    ?.map((bill) => (
+                                      <>
+                                        <tr className="border-bottom">
+
+                                          <td
+                                            scope="col"
+                                            className="border-0 font-12 ps-4"
                                           >
-                                            Payment-{transaction.supplier_transaction_id}, ({transaction?.account?.name}), Type: {transaction?.account?.accountType}
-                                          </span>
-                                        </td>
-                                        <td
-                                          scope="col"
-                                          className="border-0 font-12 font-weight-600"
-                                        >
-                                          <span
-                                            className="d-inline-block text-truncate"
-                                            style={{ maxWidth: "250px" }}
+                                            {formatDate(bill.date)}
+                                          </td>
+                                          <td
+                                            scope="col"
+                                            className="border-0 font-12 font-weight-600"
                                           >
-                                            0
-                                          </span>
-                                        </td>
-                                        <td
-                                          scope="col"
-                                          className="border-0 font-12 font-weight-600"
-                                        >
-                                          <span
-                                            className="d-inline-block text-truncate"
-                                            style={{ maxWidth: "250px" }}
+                                            <span
+                                              className="d-inline-block text-truncate"
+                                              style={{ maxWidth: "250px" }}
+                                            >
+                                              Bill-{bill.bill_no}
+                                            </span>
+                                          </td>
+                                          <td
+                                            scope="col"
+                                            className="border-0 font-12 font-weight-600"
                                           >
-                                            {/* (paid_amount from transaction) */}
-                                            {/* {supplierData?.supplier_transaction?.filter((transaction) => transaction.supplier_bill_id === bill.supplier_bill_id)?.reduce((a, b) => a + +b.amount, 0)} */}
-                                            {transaction.amount}
-                                          </span>
-                                        </td>
-                                      </tr>
-                                    ))}
+                                            <span
+                                              className="d-inline-block text-truncate"
+                                              style={{ maxWidth: "250px" }}
+                                            >
+                                              {bill.bill_amount}
+                                            </span>
+                                          </td>
+                                          <td
+                                            scope="col"
+                                            className="border-0 font-12 font-weight-600"
+                                          >
+                                            <span
+                                              className="d-inline-block text-truncate"
+                                              style={{ maxWidth: "250px" }}
+                                            >
+                                              {/* (paid_amount from transaction) */}
+                                              0
+                                            </span>
+                                          </td>
+                                        </tr>
+
+                                        {supplierData?.supplier_transaction
+                                          ?.filter((transaction) => transaction.supplier_bill_id === bill.supplier_bill_id)?.map((transaction) => (
+                                            <tr className="border-bottom">
+
+                                              <td
+                                                scope="col"
+                                                className="border-0 font-12 ps-4"
+                                              >
+                                                {formatDate(transaction.date)}
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="border-0 font-12 font-weight-600"
+                                              >
+                                                <span
+                                                  className="d-inline-block text-truncate"
+                                                >
+                                                  Payment-{transaction.supplier_transaction_id}, ({transaction?.account?.name}), Type: {transaction?.account?.accountType}
+                                                </span>
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="border-0 font-12 font-weight-600"
+                                              >
+                                                <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: "250px" }}
+                                                >
+                                                  0
+                                                </span>
+                                              </td>
+                                              <td
+                                                scope="col"
+                                                className="border-0 font-12 font-weight-600"
+                                              >
+                                                <span
+                                                  className="d-inline-block text-truncate"
+                                                  style={{ maxWidth: "250px" }}
+                                                >
+                                                  {/* (paid_amount from transaction) */}
+                                                  {transaction.amount}
+                                                </span>
+                                              </td>
+                                            </tr>
+                                          ))}
 
 
-                                  </>
-                                ))
-                              }
+                                      </>
+                                    ))
+                                }
 
 
-                            </tbody>
-                          </table>
-                        </div>
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
                       )}
 
                       {activeTab === "transaction" && (

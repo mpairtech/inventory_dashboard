@@ -128,13 +128,17 @@ const Accounts = () => {
       .catch((err) => console.log(err));
   };
 
-  const [filterFromDate, setFilterFromDate] = useState(new Date().toISOString());
-  const [filterToDate, setFilterToDate] = useState(new Date().toISOString());
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 2).toISOString();
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+  
+  const [filterFromDate, setFilterFromDate] = useState(startOfMonth);
+  const [filterToDate, setFilterToDate] = useState(endOfMonth);
 
   function groupAndSortTransfers(selectedAcc) {
     // Create an array of all transfers
     const allTransfers = [...selectedAcc?.outgoing_transfers, ...selectedAcc.incoming_transfers];
-  
+
     // Map each transfer to a transaction object
     const transactions = allTransfers.map(transfer => {
       return {
@@ -146,20 +150,20 @@ const Accounts = () => {
         credit: transfer.from_account_id === selectedAcc.account_id ? transfer.transferBalance : 0,
       };
     });
-  
+
     // Sort transactions by date in descending order
     transactions.sort((b, a) => new Date(b.date) - new Date(a.date));
-  
+
     // Calculate balance for each transaction
     let balance = 0;
     transactions.forEach(transaction => {
       balance += transaction.credit - transaction.debit;
       transaction.balance = balance;
     });
-  
+
     // Filter transactions by date
     const filteredTransactions = transactions.filter(transaction => new Date(transaction.date) >= new Date(filterFromDate) && new Date(transaction.date) <= new Date(filterToDate));
-  
+
     return filteredTransactions;
   }
 
@@ -754,11 +758,8 @@ const Accounts = () => {
 
                         {
                           activeTab === "account_history" &&
-                          <div
-                            id="printarea"
-                            className="mx-3 mt-3 border shadow-sm bg-white py-4 "
-                          >
-                            <div className="ms-3 d-flex align-items-center w-25 gap-1 ">
+                          <>
+                            <div className="mx-3 mt-3 d-flex align-items-center w-30 gap-1 ">
                               <input
                                 type="date"
                                 className="form-control font-13 shadow-none bg-white"
@@ -773,193 +774,197 @@ const Accounts = () => {
                                 value={new Date(filterToDate).toISOString().slice(0, 10)}
                               />
                             </div>
-                            <p className="font-18 mb-0 text-center">Account Report</p>
-                            {/* <p className="font-16 mb-0 text-center">ORG NAME</p> */}
-                            {/* <p className="font-14 text-center mb-0">Supplier List</p> */}
-                            <p className="font-12 text-center my-1">
-                              Date: {new Date().toLocaleDateString()}
-                            </p>
-                            <p className="font-12 text-center my-1">NOTE: All amounts are shown in BDT.</p>
-                            <table className="table align-middle mt-2">
-                              <thead>
-                                <tr className="thead-color border">
-                                  <th
-                                    scope="col"
-                                    className="border-0 font-13 text-muted font-weight-600 ps-4"
-                                    width="10%"
-                                  >
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="border-0 font-13 text-muted font-weight-600 ps-4"
-                                    width="20%"
-                                  >
-                                    Date
-                                  </th>
+                            <div
+                              id="printarea"
+                              className="mx-3 mt-3 border shadow-sm bg-white py-4 "
+                            >
 
-                                  <th
-                                    scope="col"
-                                    className="border-0 font-13 text-muted font-weight-600"
-                                    width="20%"
-                                  >
-                                    Particular
-                                  </th>
-
-                                  <th
-                                    scope="col"
-                                    className="border-0 font-13 text-muted font-weight-600"
-                                    width="20%"
-                                  >
-                                    Debit
-                                  </th>
-
-                                  <th
-                                    scope="col"
-                                    className="border-0 font-13 text-muted font-weight-600"
-                                    width="0%"
-                                  >
-                                    Credit
-                                  </th>
-                                  <th
-                                    scope="col"
-                                    className="border-0 font-13 text-muted font-weight-600"
-                                    width="0%"
-                                  >
-                                    Balance
-                                  </th>
-
-                                </tr>
-                              </thead>
-                              <tbody className="border-0">
-
-                                <tr className="border-bottom">
-                                  <td scope="col"
-                                    className="border-0 font-12 ps-4"
-                                  >
-                                  </td>
-                                  <td
-                                    scope="col"
-                                    className="border-0 font-12 ps-4"
-                                  >
-                                    {formatDate(selectedAcc?.date)}
-                                  </td>
-
-                                  <td
-                                    scope="col"
-                                    className="border-0 font-12 font-weight-600"
-                                  >
-                                    <span
-                                      className="d-inline-block text-truncate"
-                                      style={{ maxWidth: "250px" }}
+                              <p className="font-18 mb-0 text-center">Account Report</p>
+                              {/* <p className="font-16 mb-0 text-center">ORG NAME</p> */}
+                              {/* <p className="font-14 text-center mb-0">Supplier List</p> */}
+                              <p className="font-12 text-center my-1">
+                                Date: {new Date().toLocaleDateString()}
+                              </p>
+                              <p className="font-12 text-center my-1">NOTE: All amounts are shown in BDT.</p>
+                              <table className="table align-middle mt-2">
+                                <thead>
+                                  <tr className="thead-color border">
+                                    <th
+                                      scope="col"
+                                      className="border-0 font-13 text-muted font-weight-600 ps-4"
+                                      width="10%"
                                     >
-                                      Opening Balance
-                                    </span>
-                                  </td>
-
-                                  <td
-                                    scope="col"
-                                    className="border-0 font-12 font-weight-600"
-                                  >
-                                    <span
-                                      className="d-inline-block text-truncate"
-                                      style={{ maxWidth: "250px" }}
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="border-0 font-13 text-muted font-weight-600 ps-4"
+                                      width="20%"
                                     >
-                                      {selectedAcc?.balance}
-                                    </span>
-                                  </td>
-                                  <td
-                                    scope="col"
-                                    className="border-0 font-12 font-weight-600"
-                                  >
-                                    <span
-                                      className="d-inline-block text-truncate"
-                                      style={{ maxWidth: "250px" }}
+                                      Date
+                                    </th>
+
+                                    <th
+                                      scope="col"
+                                      className="border-0 font-13 text-muted font-weight-600"
+                                      width="20%"
                                     >
-                                      0
-                                    </span>
-                                  </td>
-                                  <td
-                                    scope="col"
-                                    className="border-0 font-12 font-weight-600"
-                                  >
-                                    <span
-                                      className="d-inline-block text-truncate"
-                                      style={{ maxWidth: "250px" }}
+                                      Particular
+                                    </th>
+
+                                    <th
+                                      scope="col"
+                                      className="border-0 font-13 text-muted font-weight-600"
+                                      width="20%"
                                     >
-                                      {selectedAcc?.balance}
-                                    </span>
-                                  </td>
-                                </tr>
+                                      Debit
+                                    </th>
 
-                                {/* map here */}
+                                    <th
+                                      scope="col"
+                                      className="border-0 font-13 text-muted font-weight-600"
+                                      width="0%"
+                                    >
+                                      Credit
+                                    </th>
+                                    <th
+                                      scope="col"
+                                      className="border-0 font-13 text-muted font-weight-600"
+                                      width="0%"
+                                    >
+                                      Balance
+                                    </th>
 
-                                {sortedTransactions?.map((item, index) => (
-                                  <>
-                                    <tr className="border-bottom">
-                                      <td scope="col"
-                                        className="border-0 font-12 ps-4"
-                                      >
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 ps-4"
-                                      >
-                                        {formatDate(item.date)}
-                                      </td>
+                                  </tr>
+                                </thead>
+                                <tbody className="border-0">
 
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
+                                  <tr className="border-bottom">
+                                    <td scope="col"
+                                      className="border-0 font-12 ps-4"
+                                    >
+                                    </td>
+                                    <td
+                                      scope="col"
+                                      className="border-0 font-12 ps-4"
+                                    >
+                                      {formatDate(selectedAcc?.date)}
+                                    </td>
+
+                                    <td
+                                      scope="col"
+                                      className="border-0 font-12 font-weight-600"
+                                    >
+                                      <span
+                                        className="d-inline-block text-truncate"
+                                        style={{ maxWidth: "250px" }}
                                       >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
+                                        Opening Balance
+                                      </span>
+                                    </td>
+
+                                    <td
+                                      scope="col"
+                                      className="border-0 font-12 font-weight-600"
+                                    >
+                                      <span
+                                        className="d-inline-block text-truncate"
+                                        style={{ maxWidth: "250px" }}
+                                      >
+                                        {selectedAcc?.balance}
+                                      </span>
+                                    </td>
+                                    <td
+                                      scope="col"
+                                      className="border-0 font-12 font-weight-600"
+                                    >
+                                      <span
+                                        className="d-inline-block text-truncate"
+                                        style={{ maxWidth: "250px" }}
+                                      >
+                                        0
+                                      </span>
+                                    </td>
+                                    <td
+                                      scope="col"
+                                      className="border-0 font-12 font-weight-600"
+                                    >
+                                      <span
+                                        className="d-inline-block text-truncate"
+                                        style={{ maxWidth: "250px" }}
+                                      >
+                                        {selectedAcc?.balance}
+                                      </span>
+                                    </td>
+                                  </tr>
+
+                                  {/* map here */}
+
+                                  {sortedTransactions?.map((item, index) => (
+                                    <>
+                                      <tr className="border-bottom">
+                                        <td scope="col"
+                                          className="border-0 font-12 ps-4"
                                         >
-                                          {item.particular}
-                                        </span>
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
-                                      >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 ps-4"
                                         >
-                                          {item.debit}
-                                        </span>
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
-                                      >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
-                                        >
-                                          {item.credit}
-                                        </span>
-                                      </td>
-                                      <td
-                                        scope="col"
-                                        className="border-0 font-12 font-weight-600"
-                                      >
-                                        <span
-                                          className="d-inline-block text-truncate"
-                                          style={{ maxWidth: "250px" }}
-                                        >
-                                          {selectedAcc?.balance - item.balance}
-                                        </span>
-                                      </td>
-                                    </tr>
-                                  </>
-                                ))
-                                }
+                                          {formatDate(item.date)}
+                                        </td>
 
-
-                              </tbody>
-                            </table>
-                          </div>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                            style={{ maxWidth: "250px" }}
+                                          >
+                                            {item.particular}
+                                          </span>
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                            style={{ maxWidth: "250px" }}
+                                          >
+                                            {item.debit}
+                                          </span>
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                            style={{ maxWidth: "250px" }}
+                                          >
+                                            {item.credit}
+                                          </span>
+                                        </td>
+                                        <td
+                                          scope="col"
+                                          className="border-0 font-12 font-weight-600"
+                                        >
+                                          <span
+                                            className="d-inline-block text-truncate"
+                                            style={{ maxWidth: "250px" }}
+                                          >
+                                            {selectedAcc?.balance - item.balance}
+                                          </span>
+                                        </td>
+                                      </tr>
+                                    </>
+                                  ))
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </>
                         }
                       </div>
                     </div>
