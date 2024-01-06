@@ -137,6 +137,7 @@ const CustomizeEmployee = () => {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         if (res?.employee_id) {
           toast.success("Employee added successfully");
           setUpdate(!update);

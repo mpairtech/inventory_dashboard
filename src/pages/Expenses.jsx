@@ -23,7 +23,7 @@ const customStyles = {
 
 const Expenses = () => {
   const columns = [
-  
+
     {
       name: "Expense Head",
       selector: (row) => row?.expense_head,
@@ -115,6 +115,7 @@ const Expenses = () => {
   const [storeList, setStoreList] = useState([]);
   console.log(storeList)
   const [selectedStore, setSelectedStore] = useState(null);
+  const [accountsData, setAccountsData] = useState([]);
 
   const getAllExpenses = () => {
     const data = new FormData();
@@ -125,6 +126,7 @@ const Expenses = () => {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         setData(res);
       })
       .catch((err) => console.log(err));
@@ -159,29 +161,51 @@ const Expenses = () => {
       .catch((err) => console.log(err));
   };
 
+  const getAllAccounts = () => {
+    const data = new FormData();
+    data.append("org_id", userInfo.organizationData.org_id);
+    fetch(`${import.meta.env.VITE_SERVER}/account/getAccountsForOrg`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setAccountsData(res);
+      })
+      .catch((err) => console.log(err));
+  };
+
+
   useEffect(() => {
     getAllExpenses();
     getDropDownStore()
   }, [update, selectedStore]);
 
+  useEffect(() => {
+    getAllAccounts();
+  }, []);
+
+
   const [store, setStore] = useState(null);
   const [expenseHead, setExpenseHead] = useState(null);
   const [expenseBy, setExpenseBy] = useState(null);
   const [amount, setAmount] = useState(null);
-  const [date, setDate] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [date, setDate] = useState(new Date().toISOString());
   const [description, setDescription] = useState(null);
-
   const addExpense = (e) => {
     e.preventDefault();
     const data = new FormData();
     data.append("org_id", userInfo.organizationData.org_id);
-    data.append("store_id",  store);
-    data.append("user_id",  userInfo?.user_id);
-    data.append("expense_by",  expenseBy);
-    data.append("expense_head",  expenseHead);
-    data.append("amount",  amount);
-    data.append("des",  description);
-    data.append("date",  date);
+    data.append("store_id", store);
+    data.append("user_id", userInfo?.user_id);
+    data.append("expense_by", expenseBy);
+    data.append("expense_head", expenseHead);
+    data.append("amount", amount);
+    data.append("account_id", account.account_id);
+    data.append("des", description);
+    data.append("date", date);
     fetch(`${import.meta.env.VITE_SERVER}/expense/addExpense`, {
       method: "POST",
       body: data,
@@ -326,6 +350,29 @@ const Expenses = () => {
                                 onChange={(e) => setAmount(e.target.value)}
                               />
                             </div>
+
+                            <div className="my-1 col-lg-6">
+                              <label
+                                htmlFor="recipient-name"
+                                className="col-form-label text-muted "
+                              >
+                                Account
+                              </label>
+                              <select
+                                className="form-control font-13 shadow-none"
+                                onChange={(e) => setAccount(JSON.parse(e.target.value))}
+                              >
+                                <option selected disabled value="">
+                                  Select Account
+                                </option>
+                                {
+                                  accountsData?.map((account) => (
+                                    <option value={JSON.stringify(account)}>{account.name}</option>
+                                  ))
+                                }
+                              </select>
+                            </div>
+
                             <div className="my-1 col-lg-6">
                               <label
                                 className="col-form-label text-muted fw-500"
@@ -335,7 +382,8 @@ const Expenses = () => {
                               <input
                                 type="date"
                                 className="form-control py-2 font-13 shadow-none bg-white"
-                                onChange={(e) => setDate(e.target.value)}
+                                onChange={(e) => setDate(new Date(e.target.value).toISOString())}
+                                value={new Date(date).toISOString().slice(0, 10)}
                               />
                             </div>
 
