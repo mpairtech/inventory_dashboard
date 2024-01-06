@@ -134,7 +134,7 @@ const Accounts = () => {
   function groupAndSortTransfers(selectedAcc) {
     // Create an array of all transfers
     const allTransfers = [...selectedAcc?.outgoing_transfers, ...selectedAcc.incoming_transfers];
-    console.log(allTransfers)
+  
     // Map each transfer to a transaction object
     const transactions = allTransfers.map(transfer => {
       return {
@@ -145,19 +145,22 @@ const Accounts = () => {
         debit: transfer.to_account_id === selectedAcc.account_id ? transfer.transferBalance : 0,
         credit: transfer.from_account_id === selectedAcc.account_id ? transfer.transferBalance : 0,
       };
-    }).filter(transaction => new Date(transaction.date) >= new Date(filterFromDate) && new Date(transaction.date) <= new Date(filterToDate));
-
+    });
+  
     // Sort transactions by date in descending order
     transactions.sort((b, a) => new Date(b.date) - new Date(a.date));
-
+  
     // Calculate balance for each transaction
     let balance = 0;
     transactions.forEach(transaction => {
       balance += transaction.credit - transaction.debit;
       transaction.balance = balance;
     });
-
-    return transactions;
+  
+    // Filter transactions by date
+    const filteredTransactions = transactions.filter(transaction => new Date(transaction.date) >= new Date(filterFromDate) && new Date(transaction.date) <= new Date(filterToDate));
+  
+    return filteredTransactions;
   }
 
   if (selectedAcc?.account_id) {
